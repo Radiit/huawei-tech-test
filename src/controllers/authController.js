@@ -3,7 +3,6 @@ const rbacService = require('../services/prismaRbacService');
 const { logger } = require('../utils/logger');
 
 class AuthController {
-  // Register new user
   async register(req, res) {
     try {
       const user = await authService.register(req.body);
@@ -31,7 +30,6 @@ class AuthController {
     }
   }
 
-  // Login user
   async login(req, res) {
     try {
       const { email, password } = req.body;
@@ -60,7 +58,6 @@ class AuthController {
     }
   }
 
-  // Get current user profile
   async getProfile(req, res) {
     try {
       const user = req.user;
@@ -85,7 +82,6 @@ class AuthController {
     }
   }
 
-  // Update user profile
   async updateProfile(req, res) {
     try {
       const userId = req.user.id;
@@ -114,7 +110,6 @@ class AuthController {
     }
   }
 
-  // Change password
   async changePassword(req, res) {
     try {
       const userId = req.user.id;
@@ -144,11 +139,8 @@ class AuthController {
     }
   }
 
-  // Logout (client-side token removal)
   async logout(req, res) {
     try {
-      // In a stateless JWT system, logout is handled client-side
-      // by removing the token from storage
       res.json({
         success: true,
         message: 'Logout successful'
@@ -162,7 +154,6 @@ class AuthController {
     }
   }
 
-  // Get all users (admin only)
   async getAllUsers(req, res) {
     try {
       const { search, isActive, page = 1, limit = 10, sortBy = 'created_at', sortOrder = 'DESC' } = req.query;
@@ -199,7 +190,6 @@ class AuthController {
     }
   }
 
-  // Get user by ID (admin/HR manager)
   async getUserById(req, res) {
     try {
       const { id } = req.params;
@@ -231,7 +221,6 @@ class AuthController {
     }
   }
 
-  // Update user (admin/HR manager)
   async updateUser(req, res) {
     try {
       const { id } = req.params;
@@ -260,7 +249,6 @@ class AuthController {
     }
   }
 
-  // Delete user (admin only)
   async deleteUser(req, res) {
     try {
       const { id } = req.params;
@@ -288,7 +276,6 @@ class AuthController {
     }
   }
 
-  // Assign role to user (admin/HR manager)
   async assignRole(req, res) {
     try {
       const { userId, roleId } = req.body;
@@ -316,7 +303,6 @@ class AuthController {
     }
   }
 
-  // Remove role from user (admin/HR manager)
   async removeRole(req, res) {
     try {
       const { userId, roleId } = req.body;

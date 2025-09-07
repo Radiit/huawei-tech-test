@@ -10,10 +10,8 @@ class PrismaAuthService {
     this.jwtExpiresIn = config.jwt.expiresIn;
   }
 
-  // Register new user
   async register(userData) {
     try {
-      // Check if user already exists
       const existingUser = await prisma.client.user.findUnique({
         where: { email: userData.email }
       });
@@ -22,10 +20,8 @@ class PrismaAuthService {
         throw new Error('User with this email already exists');
       }
 
-      // Hash password
       const passwordHash = await bcrypt.hash(userData.password, 12);
 
-      // Create user
       const user = await prisma.client.user.create({
         data: {
           email: userData.email,
@@ -44,7 +40,6 @@ class PrismaAuthService {
     }
   }
 
-  // Login user
   async login(email, password) {
     try {
       const user = await prisma.client.user.findUnique({
@@ -64,13 +59,11 @@ class PrismaAuthService {
         throw new Error('Invalid email or password');
       }
 
-      // Update last login
       await prisma.client.user.update({
         where: { id: user.id },
         data: { lastLogin: new Date() }
       });
 
-      // Generate JWT token
       const token = this.generateToken(user);
 
       logger.info(`User logged in: ${user.email}`);
@@ -94,7 +87,6 @@ class PrismaAuthService {
     }
   }
 
-  // Get user by ID
   async getUserById(id) {
     try {
       const user = await prisma.client.user.findUnique({
@@ -108,7 +100,6 @@ class PrismaAuthService {
     }
   }
 
-  // Get user by email
   async getUserByEmail(email) {
     try {
       const user = await prisma.client.user.findUnique({
@@ -122,7 +113,6 @@ class PrismaAuthService {
     }
   }
 
-  // Update user
   async updateUser(id, userData) {
     try {
       const existingUser = await prisma.client.user.findUnique({
@@ -151,7 +141,6 @@ class PrismaAuthService {
     }
   }
 
-  // Update password
   async updatePassword(id, currentPassword, newPassword) {
     try {
       const user = await prisma.client.user.findUnique({
@@ -182,7 +171,6 @@ class PrismaAuthService {
     }
   }
 
-  // Generate JWT token
   generateToken(user) {
     const payload = {
       id: user.id,
@@ -194,7 +182,6 @@ class PrismaAuthService {
     return jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
   }
 
-  // Verify JWT token
   verifyToken(token) {
     try {
       return jwt.verify(token, this.jwtSecret);
@@ -203,12 +190,10 @@ class PrismaAuthService {
     }
   }
 
-  // Get all users with pagination
   async getAllUsers(filters = {}, pagination = {}) {
     try {
       const where = {};
       
-      // Apply filters
       if (filters.isActive !== undefined) {
         where.isActive = filters.isActive;
       }
@@ -237,7 +222,6 @@ class PrismaAuthService {
     }
   }
 
-  // Delete user
   async deleteUser(id) {
     try {
       const user = await prisma.client.user.findUnique({

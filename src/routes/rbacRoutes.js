@@ -6,10 +6,8 @@ const { authenticate, requireAdmin, canManageRoles, canReadRoles, canCreateRoles
 
 const router = express.Router();
 
-// All routes require authentication
 router.use(authenticate);
 
-// Role routes
 router.get('/roles',
   canReadRoles,
   rbacController.getAllRoles
@@ -49,7 +47,6 @@ router.get('/roles/name/:roleName/users',
   rbacController.getUsersByRole
 );
 
-// Permission routes
 router.get('/permissions',
   canReadPermissions,
   rbacController.getAllPermissions
@@ -67,7 +64,6 @@ router.post('/permissions',
   rbacController.createPermission
 );
 
-// Role-Permission assignment routes
 router.post('/assign-permission',
   canManageRoles,
   rbacController.assignPermissionToRole
@@ -78,7 +74,6 @@ router.post('/remove-permission',
   rbacController.removePermissionFromRole
 );
 
-// User permission check routes
 router.get('/users/:userId/permissions',
   canReadUsers,
   rbacController.getUserPermissions

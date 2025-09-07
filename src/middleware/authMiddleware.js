@@ -2,7 +2,6 @@ const authService = require('../services/prismaAuthService');
 const rbacService = require('../services/prismaRbacService');
 const { logger } = require('../utils/logger');
 
-// Authentication middleware
 const authenticate = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -14,12 +13,10 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    const token = authHeader.substring(7);
     
-    // Verify token
     const decoded = authService.verifyToken(token);
     
-    // Get user from database
     const user = await authService.getUserById(decoded.id);
     if (!user || !user.isActive) {
       return res.status(401).json({
@@ -28,7 +25,6 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // Add user to request object
     req.user = user;
     next();
   } catch (error) {
@@ -40,7 +36,6 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-// Authorization middleware - check if user has specific permission
 const authorize = (resource, action) => {
   return async (req, res, next) => {
     try {
@@ -75,7 +70,6 @@ const authorize = (resource, action) => {
   };
 };
 
-// Role-based authorization middleware
 const requireRole = (roleName) => {
   return async (req, res, next) => {
     try {
@@ -106,7 +100,6 @@ const requireRole = (roleName) => {
   };
 };
 
-// Multiple roles authorization middleware
 const requireAnyRole = (roleNames) => {
   return async (req, res, next) => {
     try {
@@ -140,7 +133,6 @@ const requireAnyRole = (roleNames) => {
   };
 };
 
-// Optional authentication middleware (doesn't fail if no token)
 const optionalAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -162,19 +154,14 @@ const optionalAuth = async (req, res, next) => {
   }
 };
 
-// Admin only middleware
 const requireAdmin = requireRole('ADMIN');
 
-// HR Manager or Admin middleware
 const requireHRManager = requireAnyRole(['ADMIN', 'HR_MANAGER']);
 
-// Manager or Admin middleware
 const requireManager = requireAnyRole(['ADMIN', 'HR_MANAGER', 'MANAGER']);
 
-// Employee or higher middleware
 const requireEmployee = requireAnyRole(['ADMIN', 'HR_MANAGER', 'MANAGER', 'EMPLOYEE']);
 
-// Permission-based middleware for common resources
 const canManageUsers = authorize('users', 'MANAGE');
 const canReadUsers = authorize('users', 'READ');
 const canCreateUsers = authorize('users', 'CREATE');

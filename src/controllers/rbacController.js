@@ -2,7 +2,6 @@ const rbacService = require('../services/prismaRbacService');
 const { logger } = require('../utils/logger');
 
 class RBACController {
-  // Get all roles
   async getAllRoles(req, res) {
     try {
       const roles = await rbacService.getAllRoles();
@@ -21,7 +20,6 @@ class RBACController {
     }
   }
 
-  // Get role by ID
   async getRoleById(req, res) {
     try {
       const { id } = req.params;
@@ -53,7 +51,6 @@ class RBACController {
     }
   }
 
-  // Create role
   async createRole(req, res) {
     try {
       const role = await rbacService.createRole(req.body);
@@ -73,7 +70,6 @@ class RBACController {
     }
   }
 
-  // Update role
   async updateRole(req, res) {
     try {
       const { id } = req.params;
@@ -102,7 +98,6 @@ class RBACController {
     }
   }
 
-  // Delete role
   async deleteRole(req, res) {
     try {
       const { id } = req.params;
@@ -130,7 +125,6 @@ class RBACController {
     }
   }
 
-  // Get all permissions
   async getAllPermissions(req, res) {
     try {
       const permissions = await rbacService.getAllPermissions();
@@ -149,7 +143,6 @@ class RBACController {
     }
   }
 
-  // Get permission by ID
   async getPermissionById(req, res) {
     try {
       const { id } = req.params;
@@ -176,7 +169,6 @@ class RBACController {
     }
   }
 
-  // Create permission
   async createPermission(req, res) {
     try {
       const permission = await rbacService.createPermission(req.body);
@@ -196,7 +188,6 @@ class RBACController {
     }
   }
 
-  // Assign permission to role
   async assignPermissionToRole(req, res) {
     try {
       const { roleId, permissionId } = req.body;
@@ -224,7 +215,6 @@ class RBACController {
     }
   }
 
-  // Remove permission from role
   async removePermissionFromRole(req, res) {
     try {
       const { roleId, permissionId } = req.body;
@@ -252,7 +242,6 @@ class RBACController {
     }
   }
 
-  // Get users by role
   async getUsersByRole(req, res) {
     try {
       const { roleName } = req.params;
@@ -272,7 +261,6 @@ class RBACController {
     }
   }
 
-  // Get role permissions
   async getRolePermissions(req, res) {
     try {
       const { roleId } = req.params;
@@ -292,7 +280,6 @@ class RBACController {
     }
   }
 
-  // Get user permissions
   async getUserPermissions(req, res) {
     try {
       const { userId } = req.params;
@@ -312,7 +299,6 @@ class RBACController {
     }
   }
 
-  // Check user permission
   async checkUserPermission(req, res) {
     try {
       const { userId } = req.params;

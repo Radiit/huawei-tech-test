@@ -2,7 +2,6 @@ const prisma = require('../lib/prisma');
 const { logger } = require('../utils/logger');
 
 class PrismaRBACService {
-  // Get all roles
   async getAllRoles() {
     try {
       const roles = await prisma.client.role.findMany({
@@ -16,7 +15,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get role by ID
   async getRoleById(id) {
     try {
       const role = await prisma.client.role.findUnique({
@@ -30,7 +28,6 @@ class PrismaRBACService {
     }
   }
 
-  // Create role
   async createRole(roleData) {
     try {
       const role = await prisma.client.role.create({
@@ -45,7 +42,6 @@ class PrismaRBACService {
     }
   }
 
-  // Update role
   async updateRole(id, roleData) {
     try {
       const existingRole = await prisma.client.role.findUnique({
@@ -69,7 +65,6 @@ class PrismaRBACService {
     }
   }
 
-  // Delete role
   async deleteRole(id) {
     try {
       const existingRole = await prisma.client.role.findUnique({
@@ -92,7 +87,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get all permissions
   async getAllPermissions() {
     try {
       const permissions = await prisma.client.permission.findMany({
@@ -106,7 +100,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get permission by ID
   async getPermissionById(id) {
     try {
       const permission = await prisma.client.permission.findUnique({
@@ -120,7 +113,6 @@ class PrismaRBACService {
     }
   }
 
-  // Create permission
   async createPermission(permissionData) {
     try {
       const permission = await prisma.client.permission.create({
@@ -135,7 +127,6 @@ class PrismaRBACService {
     }
   }
 
-  // Assign role to user
   async assignRoleToUser(userId, roleId) {
     try {
       const userRole = await prisma.client.userRole.create({
@@ -156,7 +147,6 @@ class PrismaRBACService {
     }
   }
 
-  // Remove role from user
   async removeRoleFromUser(userId, roleId) {
     try {
       const result = await prisma.client.userRole.deleteMany({
@@ -178,7 +168,6 @@ class PrismaRBACService {
     }
   }
 
-  // Assign permission to role
   async assignPermissionToRole(roleId, permissionId) {
     try {
       const rolePermission = await prisma.client.rolePermission.create({
@@ -199,7 +188,6 @@ class PrismaRBACService {
     }
   }
 
-  // Remove permission from role
   async removePermissionFromRole(roleId, permissionId) {
     try {
       const result = await prisma.client.rolePermission.deleteMany({
@@ -221,7 +209,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get user roles
   async getUserRoles(userId) {
     try {
       const userRoles = await prisma.client.userRole.findMany({
@@ -238,7 +225,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get role permissions
   async getRolePermissions(roleId) {
     try {
       const rolePermissions = await prisma.client.rolePermission.findMany({
@@ -255,7 +241,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get user permissions (all permissions from all user roles)
   async getUserPermissions(userId) {
     try {
       const userRoles = await prisma.client.userRole.findMany({
@@ -289,7 +274,6 @@ class PrismaRBACService {
     }
   }
 
-  // Check if user has permission
   async userHasPermission(userId, resource, action) {
     try {
       const count = await prisma.client.userRole.count({
@@ -316,7 +300,6 @@ class PrismaRBACService {
     }
   }
 
-  // Check if user has role
   async userHasRole(userId, roleName) {
     try {
       const count = await prisma.client.userRole.count({
@@ -336,7 +319,6 @@ class PrismaRBACService {
     }
   }
 
-  // Get users by role
   async getUsersByRole(roleName) {
     try {
       const userRoles = await prisma.client.userRole.findMany({

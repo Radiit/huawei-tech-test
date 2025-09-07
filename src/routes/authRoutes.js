@@ -5,7 +5,6 @@ const { authenticate, requireAdmin, requireHRManager, canManageUsers, canReadUse
 
 const router = express.Router();
 
-// Public routes (no authentication required)
 router.post('/register',
   User.getRegistrationValidationRules(),
   User.validate,
@@ -18,10 +17,8 @@ router.post('/login',
   authController.login
 );
 
-// Protected routes (authentication required)
 router.use(authenticate);
 
-// User profile routes
 router.get('/profile', authController.getProfile);
 router.put('/profile', 
   User.getUpdateValidationRules(),
@@ -31,7 +28,6 @@ router.put('/profile',
 router.put('/change-password', authController.changePassword);
 router.post('/logout', authController.logout);
 
-// User management routes (admin/HR manager)
 router.get('/users',
   canReadUsers,
   authController.getAllUsers
@@ -54,7 +50,6 @@ router.delete('/users/:id',
   authController.deleteUser
 );
 
-// Role assignment routes (admin/HR manager)
 router.post('/assign-role',
   canManageUsers,
   authController.assignRole
