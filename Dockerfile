@@ -15,7 +15,7 @@ RUN npm ci --only=production && npm cache clean --force
 
 COPY src/ ./src/
 COPY prisma/ ./prisma/
-COPY env.example .env
+# Don't copy .env file - it will be provided at runtime
 
 # Generate Prisma client
 RUN npx prisma generate
@@ -27,6 +27,7 @@ RUN addgroup -g 1001 -S nodejs && \
 
 RUN chown -R nodejs:nodejs /app /home/cron
 
+# Switch to nodejs user
 USER nodejs
 
 EXPOSE 3000

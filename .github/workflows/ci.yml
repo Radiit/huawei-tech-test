@@ -23,7 +23,7 @@ jobs:
           apt update -y
           
           # Install required packages
-          apt install -y unzip curl
+          apt install -y unzip curl git
           
           # Install Docker if not exists
           if ! command -v docker &> /dev/null; then
@@ -33,30 +33,6 @@ jobs:
             systemctl enable docker
           fi
           
-          # Install Docker Compose if not exists
-          if ! command -v docker-compose &> /dev/null; then
-            echo "Installing Docker Compose..."
-            apt install -y docker-compose-plugin
-            # Try different paths for docker-compose
-            if [ -f "/usr/libexec/docker/cli-plugins/docker-compose" ]; then
-              ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
-              echo "Docker Compose installed via plugin (libexec)"
-            elif [ -f "/usr/lib/docker/cli-plugins/docker-compose" ]; then
-              ln -s /usr/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
-              echo "Docker Compose installed via plugin (lib)"
-            else
-              # Fallback to standalone docker-compose
-              echo "Installing standalone Docker Compose..."
-              curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-              chmod +x /usr/local/bin/docker-compose
-              echo "Docker Compose installed standalone"
-            fi
-          fi
-          
-          # Verify Docker Compose installation
-          echo "Docker Compose version:"
-          docker-compose --version
-          
           # Remove existing directory completely
           rm -rf /var/www/huawei
           
@@ -64,8 +40,12 @@ jobs:
           mkdir -p /var/www/huawei
           cd /var/www/huawei
           
-          # Clone repository
-          git clone https://github.com/Radiit/huawei-employee-management.git .
+          # Download repository as zip
+          curl -L https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip -o main.zip
+          unzip main.zip
+          mv huawei-employee-management-main/* .
+          mv huawei-employee-management-main/.* . 2>/dev/null || true
+          rm -rf huawei-employee-management-main main.zip
           
           # Create .env file
           cat > .env << EOF
@@ -86,55 +66,21 @@ jobs:
           LOG_LEVEL=info
           EOF
           
-          # Stop existing containers
-          docker-compose down || true
+          # Stop existing container
+          docker stop huawei-api || true
+          docker rm huawei-api || true
           
-          # Show current directory and files
-          echo "Current directory: $(pwd)"
-          echo "Files in directory:"
-          ls -la
+          # Build and run container
+          docker build -t huawei-api .
+          docker run -d --name huawei-api -p 3000:3000 --env-file .env --restart unless-stopped huawei-api
           
-          # Check if docker-compose.yml exists
-          if [ ! -f "docker-compose.yml" ]; then
-            echo "docker-compose.yml not found!"
-            exit 1
-          fi
+          # Wait for service to be ready
+          sleep 30
           
-          # Build and start containers
-          docker-compose up -d --build
-          
-          # Show container status
-          echo "Container status:"
-          docker-compose ps
-          
-          # Show logs
-          echo "API container logs:"
-          docker-compose logs api
-          
-          # Check if containers are running
-          if ! docker-compose ps | grep -q "Up"; then
-            echo "No containers are running, showing all logs:"
-            docker-compose logs
-            echo "Docker Compose config:"
-            docker-compose config
-            exit 1
-          fi
-          
-          # Wait for services to be ready
-          sleep 60
-          
-          # Health check with retry
-          for i in {1..5}; do
-            if curl -f http://localhost:3000/health; then
-              echo "Health check passed!"
-              break
-            else
-              echo "Health check failed, retrying in 10 seconds... ($i/5)"
-              sleep 10
-            fi
-          done
+          # Health check
+          curl -f http://localhost:3000/health || exit 1
           
           # Setup cron jobs
-          docker-compose exec -T api node src/scripts/supabaseCronSetup.js setup || true
+          docker exec huawei-api node src/scripts/supabaseCronSetup.js setup || true
           
           echo "Deployment completed successfully!"
