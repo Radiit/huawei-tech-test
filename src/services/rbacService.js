@@ -4,7 +4,6 @@ const Permission = require('../models/Permission');
 const { logger } = require('../utils/logger');
 
 class RBACService {
-  // Get all roles
   async getAllRoles() {
     try {
       const sql = 'SELECT * FROM roles WHERE is_active = 1 ORDER BY name';
@@ -16,7 +15,6 @@ class RBACService {
     }
   }
 
-  // Get role by ID
   async getRoleById(id) {
     try {
       const sql = 'SELECT * FROM roles WHERE id = ?';
@@ -33,7 +31,6 @@ class RBACService {
     }
   }
 
-  // Create role
   async createRole(roleData) {
     try {
       const role = new Role(roleData);
@@ -60,7 +57,6 @@ class RBACService {
     }
   }
 
-  // Update role
   async updateRole(id, roleData) {
     try {
       const existingRole = await this.getRoleById(id);
@@ -98,7 +94,6 @@ class RBACService {
     }
   }
 
-  // Delete role
   async deleteRole(id) {
     try {
       const sql = 'DELETE FROM roles WHERE id = ?';
@@ -116,7 +111,6 @@ class RBACService {
     }
   }
 
-  // Get all permissions
   async getAllPermissions() {
     try {
       const sql = 'SELECT * FROM permissions WHERE is_active = 1 ORDER BY resource, action';
@@ -128,7 +122,6 @@ class RBACService {
     }
   }
 
-  // Get permission by ID
   async getPermissionById(id) {
     try {
       const sql = 'SELECT * FROM permissions WHERE id = ?';
@@ -145,7 +138,6 @@ class RBACService {
     }
   }
 
-  // Create permission
   async createPermission(permissionData) {
     try {
       const permission = new Permission(permissionData);
@@ -174,7 +166,6 @@ class RBACService {
     }
   }
 
-  // Assign role to user
   async assignRoleToUser(userId, roleId) {
     try {
       const sql = `
@@ -196,7 +187,6 @@ class RBACService {
     }
   }
 
-  // Remove role from user
   async removeRoleFromUser(userId, roleId) {
     try {
       const sql = 'DELETE FROM user_roles WHERE user_id = ? AND role_id = ?';
@@ -214,7 +204,6 @@ class RBACService {
     }
   }
 
-  // Assign permission to role
   async assignPermissionToRole(roleId, permissionId) {
     try {
       const sql = `
@@ -236,7 +225,6 @@ class RBACService {
     }
   }
 
-  // Remove permission from role
   async removePermissionFromRole(roleId, permissionId) {
     try {
       const sql = 'DELETE FROM role_permissions WHERE role_id = ? AND permission_id = ?';
@@ -254,7 +242,6 @@ class RBACService {
     }
   }
 
-  // Get user roles
   async getUserRoles(userId) {
     try {
       const sql = `
@@ -272,7 +259,6 @@ class RBACService {
     }
   }
 
-  // Get role permissions
   async getRolePermissions(roleId) {
     try {
       const sql = `
@@ -290,7 +276,6 @@ class RBACService {
     }
   }
 
-  // Get user permissions (all permissions from all user roles)
   async getUserPermissions(userId) {
     try {
       const sql = `
@@ -309,7 +294,6 @@ class RBACService {
     }
   }
 
-  // Check if user has permission
   async userHasPermission(userId, resource, action) {
     try {
       const sql = `
@@ -327,7 +311,6 @@ class RBACService {
     }
   }
 
-  // Check if user has role
   async userHasRole(userId, roleName) {
     try {
       const sql = `
@@ -343,8 +326,7 @@ class RBACService {
       throw error;
     }
   }
-
-  // Get users by role
+    
   async getUsersByRole(roleName) {
     try {
       const sql = `

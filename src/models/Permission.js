@@ -12,7 +12,6 @@ class Permission {
     this.updatedAt = data.updated_at;
   }
 
-  // Validation rules for permission
   static getValidationRules() {
     return [
       body('name')
@@ -52,7 +51,6 @@ class Permission {
     ];
   }
 
-  // Validate permission data
   static validate(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -65,7 +63,6 @@ class Permission {
     next();
   }
 
-  // Convert to JSON format for API response
   toJSON() {
     return {
       id: this.id,
@@ -79,12 +76,10 @@ class Permission {
     };
   }
 
-  // Create from database row
   static fromDBRow(row) {
     return new Permission(row);
   }
 
-  // Convert to database format
   toDBFormat() {
     return {
       name: this.name,
@@ -95,7 +90,6 @@ class Permission {
     };
   }
 
-  // Check if permission matches resource and action
   matches(resource, action) {
     return this.resource === resource && this.action === action;
   }

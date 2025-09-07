@@ -14,7 +14,6 @@ class User {
     this.updatedAt = data.updated_at;
   }
 
-  // Validation rules for user registration
   static getRegistrationValidationRules() {
     return [
       body('email')
@@ -45,7 +44,6 @@ class User {
     ];
   }
 
-  // Validation rules for user login
   static getLoginValidationRules() {
     return [
       body('email')
@@ -60,7 +58,6 @@ class User {
     ];
   }
 
-  // Validation rules for user update
   static getUpdateValidationRules() {
     return [
       body('firstName')
@@ -82,7 +79,6 @@ class User {
     ];
   }
 
-  // Validate user data
   static validate(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -95,18 +91,15 @@ class User {
     next();
   }
 
-  // Hash password
   static async hashPassword(password) {
     const saltRounds = 12;
     return await bcrypt.hash(password, saltRounds);
   }
 
-  // Compare password
   async comparePassword(password) {
     return await bcrypt.compare(password, this.passwordHash);
   }
 
-  // Convert to JSON format for API response (exclude sensitive data)
   toJSON() {
     return {
       id: this.id,
@@ -120,12 +113,10 @@ class User {
     };
   }
 
-  // Create from database row
   static fromDBRow(row) {
     return new User(row);
   }
 
-  // Convert to database format
   toDBFormat() {
     return {
       email: this.email,
@@ -136,7 +127,6 @@ class User {
     };
   }
 
-  // Get full name
   getFullName() {
     return `${this.firstName} ${this.lastName}`;
   }

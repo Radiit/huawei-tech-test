@@ -7,7 +7,6 @@ class PrismaSeeder {
     this.isSeeded = false;
   }
 
-  // Check if data already exists
   async checkIfSeeded() {
     try {
       const userCount = await prisma.client.user.count();
@@ -21,7 +20,6 @@ class PrismaSeeder {
     }
   }
 
-  // Seed roles
   async seedRoles() {
     try {
       const roles = [
@@ -67,40 +65,33 @@ class PrismaSeeder {
     }
   }
 
-  // Seed permissions
   async seedPermissions() {
     try {
       const permissions = [
-        // User management permissions
         { name: 'USERS_MANAGE', resource: 'users', action: 'MANAGE', description: 'Full access to user management' },
         { name: 'USERS_READ', resource: 'users', action: 'READ', description: 'Read user information' },
         { name: 'USERS_CREATE', resource: 'users', action: 'CREATE', description: 'Create new users' },
         { name: 'USERS_UPDATE', resource: 'users', action: 'UPDATE', description: 'Update user information' },
         { name: 'USERS_DELETE', resource: 'users', action: 'DELETE', description: 'Delete users' },
 
-        // Employee management permissions
         { name: 'EMPLOYEES_MANAGE', resource: 'employees', action: 'MANAGE', description: 'Full access to employee management' },
         { name: 'EMPLOYEES_READ', resource: 'employees', action: 'READ', description: 'Read employee information' },
         { name: 'EMPLOYEES_CREATE', resource: 'employees', action: 'CREATE', description: 'Create new employees' },
         { name: 'EMPLOYEES_UPDATE', resource: 'employees', action: 'UPDATE', description: 'Update employee information' },
         { name: 'EMPLOYEES_DELETE', resource: 'employees', action: 'DELETE', description: 'Delete employees' },
 
-        // Role management permissions
         { name: 'ROLES_MANAGE', resource: 'roles', action: 'MANAGE', description: 'Full access to role management' },
         { name: 'ROLES_READ', resource: 'roles', action: 'READ', description: 'Read role information' },
         { name: 'ROLES_CREATE', resource: 'roles', action: 'CREATE', description: 'Create new roles' },
         { name: 'ROLES_UPDATE', resource: 'roles', action: 'UPDATE', description: 'Update role information' },
         { name: 'ROLES_DELETE', resource: 'roles', action: 'DELETE', description: 'Delete roles' },
 
-        // Permission management permissions
         { name: 'PERMISSIONS_MANAGE', resource: 'permissions', action: 'MANAGE', description: 'Full access to permission management' },
         { name: 'PERMISSIONS_READ', resource: 'permissions', action: 'READ', description: 'Read permission information' },
 
-        // Report permissions
         { name: 'REPORTS_MANAGE', resource: 'reports', action: 'MANAGE', description: 'Full access to reports and analytics' },
         { name: 'REPORTS_READ', resource: 'reports', action: 'READ', description: 'Read reports and analytics' },
 
-        // System management permissions
         { name: 'SYSTEM_MANAGE', resource: 'system', action: 'MANAGE', description: 'Full access to system administration' }
       ];
 
@@ -124,15 +115,13 @@ class PrismaSeeder {
     }
   }
 
-  // Assign permissions to roles
   async assignPermissionsToRoles() {
     try {
-      // Get all roles and permissions
       const roles = await prisma.client.role.findMany();
       const permissions = await prisma.client.permission.findMany();
 
       const rolePermissionMap = {
-        'ADMIN': permissions.map(p => p.name), // Admin gets all permissions
+        'ADMIN': permissions.map(p => p.name),
         'HR_MANAGER': [
           'USERS_MANAGE', 'USERS_READ', 'USERS_CREATE', 'USERS_UPDATE', 'USERS_DELETE',
           'EMPLOYEES_MANAGE', 'EMPLOYEES_READ', 'EMPLOYEES_CREATE', 'EMPLOYEES_UPDATE', 'EMPLOYEES_DELETE',
@@ -185,7 +174,6 @@ class PrismaSeeder {
     }
   }
 
-  // Seed users
   async seedUsers() {
     try {
       const users = [
@@ -252,7 +240,6 @@ class PrismaSeeder {
     }
   }
 
-  // Assign roles to users
   async assignRolesToUsers() {
     try {
       const roles = await prisma.client.role.findMany();
@@ -300,7 +287,6 @@ class PrismaSeeder {
     }
   }
 
-  // Seed sample employees
   async seedEmployees() {
     try {
       const employees = [
@@ -376,7 +362,6 @@ class PrismaSeeder {
           });
           logger.info(`Employee created/updated: ${employeeData.name}`);
         } catch (error) {
-          // If unique constraint doesn't exist, try with just name
           try {
             await prisma.client.employee.create({
               data: employeeData
@@ -395,22 +380,18 @@ class PrismaSeeder {
     }
   }
 
-  // Main seed method
   async seed() {
     try {
       logger.info('Starting Prisma database seeding...');
       
-      // Check if already seeded
       const alreadySeeded = await this.checkIfSeeded();
       if (alreadySeeded) {
         logger.info('Database already seeded, skipping...');
         return { success: true, message: 'Database already seeded' };
       }
 
-      // Connect to database
       await prisma.connect();
 
-      // Seed in order
       await this.seedRoles();
       await this.seedPermissions();
       await this.assignPermissionsToRoles();
@@ -439,14 +420,12 @@ class PrismaSeeder {
     }
   }
 
-  // Reset database (for development)
   async reset() {
     try {
       logger.info('Resetting Prisma database...');
       
       await prisma.connect();
       
-      // Delete all data in reverse order of dependencies
       await prisma.client.userRole.deleteMany();
       await prisma.client.rolePermission.deleteMany();
       await prisma.client.session.deleteMany();
@@ -458,7 +437,6 @@ class PrismaSeeder {
       
       logger.info('Database reset completed');
       
-      // Re-seed
       await this.seed();
       
       return { success: true, message: 'Database reset and re-seeded successfully' };
@@ -471,7 +449,6 @@ class PrismaSeeder {
   }
 }
 
-// Run if called directly
 if (require.main === module) {
   const seeder = new PrismaSeeder();
   
@@ -501,4 +478,4 @@ if (require.main === module) {
 }
 
 module.exports = PrismaSeeder;
-
+    

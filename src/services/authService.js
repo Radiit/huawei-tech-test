@@ -10,19 +10,15 @@ class AuthService {
     this.jwtExpiresIn = config.jwt.expiresIn;
   }
 
-  // Register new user
   async register(userData) {
     try {
-      // Check if user already exists
       const existingUser = await this.getUserByEmail(userData.email);
       if (existingUser) {
         throw new Error('User with this email already exists');
       }
 
-      // Hash password
       const passwordHash = await User.hashPassword(userData.password);
 
-      // Create user
       const user = new User({
         email: userData.email,
         password_hash: passwordHash,
@@ -44,7 +40,6 @@ class AuthService {
         user.isActive
       ]);
 
-      // Get created user
       const createdUser = await this.getUserById(result.id);
       logger.info(`User registered with ID: ${result.id}`);
 
@@ -55,7 +50,6 @@ class AuthService {
     }
   }
 
-  // Login user
   async login(email, password) {
     try {
       const user = await this.getUserByEmail(email);
@@ -72,10 +66,8 @@ class AuthService {
         throw new Error('Invalid email or password');
       }
 
-      // Update last login
       await this.updateLastLogin(user.id);
 
-      // Generate JWT token
       const token = this.generateToken(user);
 
       logger.info(`User logged in: ${user.email}`);
@@ -90,7 +82,6 @@ class AuthService {
     }
   }
 
-  // Get user by ID
   async getUserById(id) {
     try {
       const sql = 'SELECT * FROM users WHERE id = ?';
@@ -107,7 +98,6 @@ class AuthService {
     }
   }
 
-  // Get user by email
   async getUserByEmail(email) {
     try {
       const sql = 'SELECT * FROM users WHERE email = ?';
@@ -124,7 +114,6 @@ class AuthService {
     }
   }
 
-  // Update user
   async updateUser(id, userData) {
     try {
       const existingUser = await this.getUserById(id);
@@ -170,7 +159,6 @@ class AuthService {
     }
   }
 
-  // Update password
   async updatePassword(id, currentPassword, newPassword) {
     try {
       const user = await this.getUserById(id);
@@ -196,7 +184,6 @@ class AuthService {
     }
   }
 
-  // Update last login
   async updateLastLogin(id) {
     try {
       const sql = 'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?';
@@ -207,7 +194,6 @@ class AuthService {
     }
   }
 
-  // Generate JWT token
   generateToken(user) {
     const payload = {
       id: user.id,
@@ -219,7 +205,6 @@ class AuthService {
     return jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
   }
 
-  // Verify JWT token
   verifyToken(token) {
     try {
       return jwt.verify(token, this.jwtSecret);
@@ -228,13 +213,11 @@ class AuthService {
     }
   }
 
-  // Get all users with pagination
   async getAllUsers(filters = {}, pagination = {}) {
     try {
       let sql = 'SELECT * FROM users WHERE 1=1';
       const params = [];
 
-      // Apply filters
       if (filters.isActive !== undefined) {
         sql += ' AND is_active = ?';
         params.push(filters.isActive);
@@ -246,12 +229,10 @@ class AuthService {
         params.push(searchTerm, searchTerm, searchTerm);
       }
 
-      // Apply sorting
       const sortBy = pagination.sortBy || 'created_at';
       const sortOrder = pagination.sortOrder || 'DESC';
       sql += ` ORDER BY ${sortBy} ${sortOrder}`;
 
-      // Apply pagination
       if (pagination.limit) {
         sql += ' LIMIT ?';
         params.push(pagination.limit);
@@ -269,8 +250,7 @@ class AuthService {
       throw error;
     }
   }
-
-  // Delete user
+    
   async deleteUser(id) {
     try {
       const sql = 'DELETE FROM users WHERE id = ?';

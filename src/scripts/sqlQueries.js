@@ -6,19 +6,16 @@ class SQLQueries {
     this.initializeData();
   }
 
-  // Initialize with sample data from requirement
   async initializeData() {
     try {
       await database.connect();
 
-      // Check if data already exists
       const existingData = await database.query('SELECT COUNT(*) as count FROM employees');
       if (existingData[0].count > 0) {
         logger.info('Sample data already exists, skipping initialization');
         return;
       }
 
-      // Insert sample data from requirement
       const sampleData = [
         {
           name: 'Jacky',
@@ -26,7 +23,7 @@ class SQLQueries {
           join_date: '2018-07-25',
           release_date: '2022-07-25',
           experience_years: 8,
-          salary: 0 // Salary not specified in requirement
+          salary: 0
         },
         {
           name: 'John',
@@ -93,7 +90,6 @@ class SQLQueries {
     }
   }
 
-  // 1. Add Albert as Engineer
   async addAlbert() {
     try {
       const sql = `
@@ -117,7 +113,6 @@ class SQLQueries {
     }
   }
 
-  // 2. Update Engineer salary (assuming $1000 as not specified)
   async updateEngineerSalary(salary = 1000) {
     try {
       const sql = `
@@ -140,7 +135,6 @@ class SQLQueries {
     }
   }
 
-  // 3. Calculate total salary for 2021
   async getTotalSalary2021() {
     try {
       const sql = `
@@ -166,7 +160,6 @@ class SQLQueries {
     }
   }
 
-  // 4. Get top 3 employees by experience
   async getTop3ByExperience() {
     try {
       const sql = `
@@ -190,7 +183,6 @@ class SQLQueries {
     }
   }
 
-  // 5. Get engineers with experience <= 3 years (subquery)
   async getEngineersLowExperience() {
     try {
       const sql = `
@@ -215,26 +207,16 @@ class SQLQueries {
     }
   }
 
-  // Run all queries as specified in requirement
   async runAllQueries() {
     try {
       logger.info('Running all SQL queries from requirement');
 
       const results = {};
 
-      // 1. Add Albert
       results.addAlbert = await this.addAlbert();
-
-      // 2. Update Engineer salary
       results.updateEngineerSalary = await this.updateEngineerSalary(1000);
-
-      // 3. Calculate total salary for 2021
       results.totalSalary2021 = await this.getTotalSalary2021();
-
-      // 4. Get top 3 by experience
       results.top3ByExperience = await this.getTop3ByExperience();
-
-      // 5. Get engineers with low experience
       results.engineersLowExperience = await this.getEngineersLowExperience();
 
       logger.info('All SQL queries completed successfully');
@@ -250,7 +232,6 @@ class SQLQueries {
     }
   }
 
-  // Get all employees
   async getAllEmployees() {
     try {
       const sql = 'SELECT * FROM employees ORDER BY experience_years DESC';
@@ -268,7 +249,7 @@ class SQLQueries {
   }
 }
 
-// Run if called directly
+
 if (require.main === module) {
   const sqlQueries = new SQLQueries();
 

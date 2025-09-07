@@ -9,7 +9,6 @@ class DataCleanup {
     this.dataPath = config.cron.dataPath;
   }
 
-  // Ensure data directory exists
   ensureDataDirectory() {
     if (!fs.existsSync(this.dataPath)) {
       logger.warn(`Data directory does not exist: ${this.dataPath}`);
@@ -18,7 +17,6 @@ class DataCleanup {
     return true;
   }
 
-  // Get files older than specified days
   getOldFiles(days = 30) {
     try {
       if (!this.ensureDataDirectory()) {
@@ -43,7 +41,6 @@ class DataCleanup {
     }
   }
 
-  // Delete old files
   async deleteOldFiles(files) {
     const deletedFiles = [];
     const failedFiles = [];
@@ -63,7 +60,6 @@ class DataCleanup {
     return { deletedFiles, failedFiles };
   }
 
-  // Update database records for deleted files
   async updateDatabaseRecords(deletedFiles) {
     try {
       await database.connect();
@@ -84,7 +80,6 @@ class DataCleanup {
     }
   }
 
-  // Get cleanup statistics
   async getCleanupStats() {
     try {
       await database.connect();
@@ -109,12 +104,10 @@ class DataCleanup {
     }
   }
 
-  // Main cleanup process
   async run(days = 30) {
     try {
       logger.info(`Starting data cleanup process (files older than ${days} days)`);
 
-      // Get old files
       const oldFiles = this.getOldFiles(days);
 
       if (oldFiles.length === 0) {
@@ -127,15 +120,12 @@ class DataCleanup {
         };
       }
 
-      // Delete old files
       const { deletedFiles, failedFiles } = await this.deleteOldFiles(oldFiles);
 
-      // Update database records
       if (deletedFiles.length > 0) {
         await this.updateDatabaseRecords(deletedFiles);
       }
 
-      // Get cleanup statistics
       const stats = await this.getCleanupStats();
 
       logger.info('Data cleanup process completed', {
@@ -160,7 +150,6 @@ class DataCleanup {
   }
 }
 
-// Run if called directly
 if (require.main === module) {
   const cleanup = new DataCleanup();
   const days = process.argv[2] ? parseInt(process.argv[2]) : 30;

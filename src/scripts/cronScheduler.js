@@ -11,7 +11,6 @@ class CronScheduler {
     this.tasks = [];
   }
 
-  // Schedule data collection tasks
   scheduleDataCollection() {
     this.collectionTimes.forEach((time) => {
       const [hours, minutes] = time.split(':');
@@ -42,7 +41,6 @@ class CronScheduler {
     });
   }
 
-  // Schedule data cleanup task (daily at 2 AM)
   scheduleDataCleanup() {
     const task = cron.schedule('0 2 * * *', async () => {
       try {
@@ -68,13 +66,11 @@ class CronScheduler {
     logger.info('Scheduled data cleanup task: 0 2 * * * (2:00 AM WIB)');
   }
 
-  // Start all scheduled tasks
   start() {
     try {
       this.scheduleDataCollection();
       this.scheduleDataCleanup();
 
-      // Start all tasks
       this.tasks.forEach(({ name, task, description }) => {
         task.start();
         logger.info(`Started cron task: ${name} - ${description}`);
@@ -87,7 +83,6 @@ class CronScheduler {
     }
   }
 
-  // Stop all scheduled tasks
   stop() {
     this.tasks.forEach(({ name, task }) => {
       task.stop();
@@ -96,7 +91,6 @@ class CronScheduler {
     logger.info('Cron scheduler stopped');
   }
 
-  // Get task status
   getStatus() {
     return this.tasks.map(({ name, task, schedule, description }) => ({
       name,
@@ -106,7 +100,6 @@ class CronScheduler {
     }));
   }
 
-  // Run data collection manually
   async runDataCollection() {
     try {
       logger.info('Running manual data collection');
@@ -120,7 +113,6 @@ class CronScheduler {
     }
   }
 
-  // Run data cleanup manually
   async runDataCleanup(days = 30) {
     try {
       logger.info(`Running manual data cleanup (${days} days)`);
@@ -135,14 +127,11 @@ class CronScheduler {
   }
 }
 
-// Create and export scheduler instance
 const scheduler = new CronScheduler();
 
-// Start scheduler if this file is run directly
 if (require.main === module) {
   scheduler.start();
 
-  // Keep the process running
   process.on('SIGINT', () => {
     logger.info('Received SIGINT, stopping cron scheduler');
     scheduler.stop();

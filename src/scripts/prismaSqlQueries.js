@@ -12,7 +12,7 @@ class PrismaSQLQueries {
     };
   }
 
-  // 1. Add Albert as new employee
+
   async addAlbert() {
     try {
       const albert = await prisma.client.employee.upsert({
@@ -50,7 +50,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // 2. Update engineer salary by 10%
+
   async updateEngineerSalary() {
     try {
       const result = await prisma.client.employee.updateMany({
@@ -76,7 +76,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // 3. Get total salary for 2021
+
   async getTotalSalary2021() {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -129,7 +129,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // 4. Get top 3 employees by experience
+
   async getTop3ByExperience() {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -152,7 +152,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // 5. Get engineers with low experience (≤ 2 years)
+
   async getEngineersWithLowExperience() {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -179,7 +179,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // Execute all queries
+
   async executeAllQueries() {
     try {
       logger.info('Starting execution of all SQL queries...');
@@ -212,7 +212,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // Execute specific query
+
   async executeQuery(queryName) {
     try {
       if (!this.queries[queryName]) {
@@ -230,7 +230,7 @@ class PrismaSQLQueries {
     }
   }
 
-  // List available queries
+
   listQueries() {
     return {
       success: true,
@@ -241,7 +241,7 @@ class PrismaSQLQueries {
     };
   }
 
-  // Get query description
+
   getQueryDescription(queryName) {
     const descriptions = {
       addAlbert: 'Add Albert as a new Engineer employee',
@@ -255,7 +255,7 @@ class PrismaSQLQueries {
   }
 }
 
-// Run if called directly
+    
 if (require.main === module) {
   const queries = new PrismaSQLQueries();
   

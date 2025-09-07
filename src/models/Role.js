@@ -10,7 +10,6 @@ class Role {
     this.updatedAt = data.updated_at;
   }
 
-  // Validation rules for role
   static getValidationRules() {
     return [
       body('name')
@@ -36,7 +35,6 @@ class Role {
     ];
   }
 
-  // Validate role data
   static validate(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -49,7 +47,6 @@ class Role {
     next();
   }
 
-  // Convert to JSON format for API response
   toJSON() {
     return {
       id: this.id,
@@ -61,12 +58,10 @@ class Role {
     };
   }
 
-  // Create from database row
   static fromDBRow(row) {
     return new Role(row);
   }
 
-  // Convert to database format
   toDBFormat() {
     return {
       name: this.name,

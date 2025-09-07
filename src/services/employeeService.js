@@ -3,13 +3,11 @@ const Employee = require('../models/Employee');
 const { logger } = require('../utils/logger');
 
 class EmployeeService {
-  // Get all employees with optional filtering and pagination
   async getAllEmployees(filters = {}, pagination = {}) {
     try {
       let sql = 'SELECT * FROM employees WHERE 1=1';
       const params = [];
 
-      // Apply filters
       if (filters.position) {
         sql += ' AND position = ?';
         params.push(filters.position);
@@ -25,12 +23,10 @@ class EmployeeService {
         params.push(filters.maxExperience);
       }
 
-      // Apply sorting
       const sortBy = pagination.sortBy || 'created_at';
       const sortOrder = pagination.sortOrder || 'DESC';
       sql += ` ORDER BY ${sortBy} ${sortOrder}`;
 
-      // Apply pagination
       if (pagination.limit) {
         sql += ' LIMIT ?';
         params.push(pagination.limit);
@@ -49,7 +45,6 @@ class EmployeeService {
     }
   }
 
-  // Get employee by ID
   async getEmployeeById(id) {
     try {
       const sql = 'SELECT * FROM employees WHERE id = ?';
@@ -66,7 +61,6 @@ class EmployeeService {
     }
   }
 
-  // Create new employee
   async createEmployee(employeeData) {
     try {
       const employee = new Employee(employeeData);
@@ -88,7 +82,6 @@ class EmployeeService {
 
       const result = await database.run(sql, params);
 
-      // Return the created employee with ID
       const createdEmployee = await this.getEmployeeById(result.id);
       logger.info(`Employee created with ID: ${result.id}`);
 
@@ -99,7 +92,6 @@ class EmployeeService {
     }
   }
 
-  // Update employee
   async updateEmployee(id, employeeData) {
     try {
       const existingEmployee = await this.getEmployeeById(id);
@@ -143,7 +135,6 @@ class EmployeeService {
     }
   }
 
-  // Delete employee
   async deleteEmployee(id) {
     try {
       const sql = 'DELETE FROM employees WHERE id = ?';
@@ -161,7 +152,6 @@ class EmployeeService {
     }
   }
 
-  // Get employees by position
   async getEmployeesByPosition(position) {
     try {
       const sql = 'SELECT * FROM employees WHERE position = ? ORDER BY experience_years DESC';
@@ -173,7 +163,6 @@ class EmployeeService {
     }
   }
 
-  // Get total salary for a specific year
   async getTotalSalaryForYear(year) {
     try {
       const sql = `
@@ -191,7 +180,6 @@ class EmployeeService {
     }
   }
 
-  // Get top employees by experience
   async getTopEmployeesByExperience(limit = 3) {
     try {
       const sql = `
@@ -208,7 +196,6 @@ class EmployeeService {
     }
   }
 
-  // Get engineers with experience <= 3 years
   async getEngineersWithLowExperience() {
     try {
       const sql = `
@@ -225,7 +212,6 @@ class EmployeeService {
     }
   }
 
-  // Update salary for all engineers
   async updateEngineerSalary(newSalary) {
     try {
       const sql = `

@@ -15,7 +15,6 @@ class DataCollector {
     this.retryAttempts = config.dataCollection.retryAttempts;
   }
 
-  // Ensure data directory exists
   ensureDataDirectory() {
     if (!fs.existsSync(this.dataPath)) {
       fs.mkdirSync(this.dataPath, { recursive: true });
@@ -23,7 +22,6 @@ class DataCollector {
     }
   }
 
-  // Collect data from source
   async collectData() {
     let attempt = 0;
     let lastError;
@@ -61,7 +59,6 @@ class DataCollector {
     throw new Error(`Data collection failed after ${this.retryAttempts} attempts. Last error: ${lastError.message}`);
   }
 
-  // Generate filename with current date and time
   generateFilename() {
     const now = new Date();
     const date = now.toISOString().split('T')[0].replace(/-/g, '');
@@ -69,18 +66,15 @@ class DataCollector {
     return `cron_${date}_${time}.csv`;
   }
 
-  // Save data to CSV file
   async saveToCSV(data, filename) {
     try {
       this.ensureDataDirectory();
 
       const filePath = path.join(this.dataPath, filename);
 
-      // Convert data to CSV format
       let csvData = [];
 
       if (Array.isArray(data)) {
-        // If data is array of objects
         csvData = data.map((item, index) => ({
           id: item.id || index + 1,
           title: item.title || '',
@@ -89,7 +83,6 @@ class DataCollector {
           collected_at: new Date().toISOString()
         }));
       } else if (typeof data === 'object') {
-        // If data is single object
         csvData = [{
           id: data.id || 1,
           title: data.title || '',
@@ -98,7 +91,6 @@ class DataCollector {
           collected_at: new Date().toISOString()
         }];
       } else {
-        // If data is not object/array, create generic entry
         csvData = [{
           id: 1,
           title: 'Data Collection',
@@ -129,7 +121,6 @@ class DataCollector {
     }
   }
 
-  // Save collection record to database
   async saveCollectionRecord(filename, data) {
     try {
       await prisma.connect();
@@ -139,7 +130,6 @@ class DataCollector {
       const collectionTime = now.toTimeString().split(' ')[0];
       const dataContent = JSON.stringify(data);
 
-      // Upload CSV file to Supabase Storage
       const filePath = path.join(this.dataPath, filename);
       const fileBuffer = await fs.readFile(filePath);
       
@@ -171,21 +161,14 @@ class DataCollector {
     }
   }
 
-  // Main collection process
   async run() {
     try {
       logger.info('Starting data collection process');
 
-      // Collect data from source
       const data = await this.collectData();
-
-      // Generate filename
       const filename = this.generateFilename();
-
-      // Save to CSV
       const filePath = await this.saveToCSV(data, filename);
 
-      // Save collection record to database
       await this.saveCollectionRecord(filename, data);
 
       logger.info('Data collection process completed successfully', {
@@ -208,7 +191,6 @@ class DataCollector {
   }
 }
 
-// Run if called directly
 if (require.main === module) {
   const collector = new DataCollector();
   collector.run()

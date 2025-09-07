@@ -2,12 +2,10 @@ const prisma = require('../lib/prisma');
 const { logger } = require('../utils/logger');
 
 class PrismaEmployeeService {
-  // Get all employees with optional filtering
   async getAllEmployees(filters = {}, pagination = {}) {
     try {
       const where = {};
       
-      // Apply filters
       if (filters.position) {
         where.position = { contains: filters.position, mode: 'insensitive' };
       }
@@ -41,7 +39,6 @@ class PrismaEmployeeService {
         ];
       }
 
-      // Map database field names to Prisma field names
       const fieldMapping = {
         'created_at': 'createdAt',
         'updated_at': 'updatedAt',
@@ -70,7 +67,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Get employee by ID
   async getEmployeeById(id) {
     try {
       const employee = await prisma.client.employee.findUnique({
@@ -88,12 +84,10 @@ class PrismaEmployeeService {
     }
   }
 
-  // Create employee
   async createEmployee(employeeData) {
     try {
       logger.info('Received employee data:', employeeData);
       
-      // Map field names to Prisma field names
       const mappedData = {
         name: employeeData.name,
         position: employeeData.position,
@@ -117,7 +111,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Update employee
   async updateEmployee(id, employeeData) {
     try {
       const existingEmployee = await prisma.client.employee.findUnique({
@@ -141,7 +134,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Delete employee
   async deleteEmployee(id) {
     try {
       const existingEmployee = await prisma.client.employee.findUnique({
@@ -164,7 +156,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Get employees by position
   async getEmployeesByPosition(position) {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -181,7 +172,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Get top employees by experience
   async getTopEmployeesByExperience(limit = 3) {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -196,7 +186,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Get engineers with low experience
   async getEngineersWithLowExperience(maxExperience = 2) {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -214,7 +203,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Get total salary for specific year
   async getTotalSalaryForYear(year) {
     try {
       const employees = await prisma.client.employee.findMany({
@@ -265,7 +253,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Update engineer salary
   async updateEngineerSalary(percentage) {
     try {
       const result = await prisma.client.employee.updateMany({
@@ -291,7 +278,6 @@ class PrismaEmployeeService {
     }
   }
 
-  // Add Albert as new employee
   async addAlbert() {
     try {
       const albert = await prisma.client.employee.upsert({
