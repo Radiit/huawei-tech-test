@@ -47,43 +47,20 @@ jobs:
           echo "Directory contents:"
           ls -la
           
-          # Try wget first, then curl as fallback
-          if command -v wget &> /dev/null; then
-            wget -O huawei.zip https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip
+          # Setup git config
+          git config --global user.email "radityaaydin@gmail.com"
+          git config --global user.name "Deploy Bot"
+          
+          # Try to pull if directory exists, otherwise clone
+          if [ -d "huawei" ] && [ -d "huawei/.git" ]; then
+            echo "Directory exists, trying to pull..."
+            cd huawei
+            git pull origin main
           else
-            curl -L -H "User-Agent: Mozilla/5.0 (Linux; Ubuntu 20.04) AppleWebKit/537.36" https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip -o huawei.zip
+            echo "Directory doesn't exist, cloning..."
+            git clone https://github.com/Radiit/huawei-employee-management.git huawei
+            cd huawei
           fi
-          
-          # Check if download was successful
-          if [ ! -f "huawei.zip" ] || [ ! -s "huawei.zip" ]; then
-            echo "Failed to download repository"
-            echo "File size: $(ls -la huawei.zip)"
-            exit 1
-          fi
-          
-          # Check file type
-          file huawei.zip
-          
-          # Extract zip
-          unzip huawei.zip
-          
-          # Find the extracted directory
-          EXTRACTED_DIR=$(find . -maxdepth 1 -type d -name "huawei-employee-management-main" | head -1)
-          
-          if [ -z "$EXTRACTED_DIR" ]; then
-            echo "Failed to find extracted directory"
-            ls -la
-            exit 1
-          fi
-          
-          # Rename to huawei
-          mv "$EXTRACTED_DIR" huawei
-          
-          # Clean up zip file
-          rm huawei.zip
-          
-          # Change to project directory
-          cd huawei
           
           # Verify files
           if [ ! -f "Dockerfile" ]; then
