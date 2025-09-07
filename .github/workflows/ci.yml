@@ -33,19 +33,36 @@ jobs:
             systemctl enable docker
           fi
           
+          # Ensure /var/www directory exists
+          mkdir -p /var/www
+          
           # Remove existing directory completely
           rm -rf /var/www/huawei
           
-          # Create fresh project directory
-          mkdir -p /var/www/huawei
-          cd /var/www/huawei
+          # Change to /var/www directory
+          cd /var/www
           
-          # Download repository as zip
-          curl -L https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip -o main.zip
-          unzip main.zip
-          mv huawei-employee-management-main/* .
-          mv huawei-employee-management-main/.* . 2>/dev/null || true
-          rm -rf huawei-employee-management-main main.zip
+          # Verify we're in the right directory
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          
+          # Setup git config
+          git config --global user.email "radityaaydin@gmail.com"
+          git config --global user.name "Deploy Bot"
+          
+          # Clone repository
+          git clone https://github.com/Radiit/huawei-employee-management.git huawei
+          
+          # Change to project directory
+          cd huawei
+          
+          # Verify files
+          if [ ! -f "Dockerfile" ]; then
+            echo "Dockerfile not found after clone"
+            ls -la
+            exit 1
+          fi
           
           # Create .env file
           cat > .env << EOF
