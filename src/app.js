@@ -16,6 +16,8 @@ const employeeRoutes = require('./routes/employeeRoutes');
 const authRoutes = require('./routes/authRoutes');
 const rbacRoutes = require('./routes/rbacRoutes');
 const fileRoutes = require('./routes/fileRoutes');
+const cronRoutes = require('./routes/cronRoutes');
+const supabaseCronRoutes = require('./routes/supabaseCronRoutes');
 
 class Application {
   constructor() {
@@ -90,6 +92,8 @@ class Application {
     this.app.use('/api/rbac', rbacRoutes);
     this.app.use('/api/employees', employeeRoutes);
     this.app.use('/api/files', fileRoutes);
+    this.app.use('/api/cron', cronRoutes);
+    this.app.use('/api/supabase-cron', supabaseCronRoutes);
 
     // Root endpoint
     this.app.get('/', (req, res) => {
@@ -102,6 +106,9 @@ class Application {
           auth: '/api/auth',
           rbac: '/api/rbac',
           employees: '/api/employees',
+          files: '/api/files',
+          cron: '/api/cron',
+        supabaseCron: '/api/supabase-cron',
           documentation: '/api-docs'
         }
       });

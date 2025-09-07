@@ -4,7 +4,6 @@ const config = require('../config/config');
 
 class SupabaseStorageService {
   constructor() {
-    // Check if Supabase is configured
     if (!config.supabase.url || !config.supabase.serviceRoleKey) {
       logger.warn('Supabase not configured, file storage will be disabled');
       this.supabase = null;
@@ -19,7 +18,6 @@ class SupabaseStorageService {
     this.bucketName = 'huawei';
   }
 
-  // Upload file to Supabase Storage
   async uploadFile(file, path, options = {}) {
     try {
       if (!this.supabase) {
@@ -38,7 +36,6 @@ class SupabaseStorageService {
         throw new Error(`Upload failed: ${error.message}`);
       }
 
-      // Get public URL
       const { data: urlData } = this.supabase.storage
         .from(this.bucketName)
         .getPublicUrl(path);
@@ -55,7 +52,6 @@ class SupabaseStorageService {
     }
   }
 
-  // Download file from Supabase Storage
   async downloadFile(path) {
     try {
       if (!this.supabase) {
@@ -79,7 +75,6 @@ class SupabaseStorageService {
     }
   }
 
-  // Get file URL
   getFileUrl(path) {
     if (!this.supabase) {
       return `https://supabase-not-configured.com/${path}`;
@@ -92,7 +87,6 @@ class SupabaseStorageService {
     return data.publicUrl;
   }
 
-  // Delete file from Supabase Storage
   async deleteFile(path) {
     try {
       if (!this.supabase) {
@@ -116,7 +110,6 @@ class SupabaseStorageService {
     }
   }
 
-  // List files in bucket
   async listFiles(folder = '') {
     try {
       if (!this.supabase) {
@@ -140,7 +133,6 @@ class SupabaseStorageService {
     }
   }
 
-  // Create signed URL for private file access
   async createSignedUrl(path, expiresIn = 3600) {
     try {
       if (!this.supabase) {
@@ -164,7 +156,6 @@ class SupabaseStorageService {
     }
   }
 
-  // Upload employee document
   async uploadEmployeeDocument(employeeId, file, documentType) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileExtension = file.originalname.split('.').pop();
@@ -180,7 +171,6 @@ class SupabaseStorageService {
     });
   }
 
-  // Upload profile picture
   async uploadProfilePicture(userId, file) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileExtension = file.originalname.split('.').pop();
@@ -196,7 +186,6 @@ class SupabaseStorageService {
     });
   }
 
-  // Upload data collection file
   async uploadDataCollectionFile(file, collectionId) {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const fileExtension = file.originalname.split('.').pop();
@@ -212,7 +201,6 @@ class SupabaseStorageService {
     });
   }
 
-  // Health check
   async healthCheck() {
     try {
       await this.listFiles();

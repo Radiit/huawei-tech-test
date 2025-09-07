@@ -1,0 +1,166 @@
+const supabaseCronService = require('../services/supabaseCronService');
+const { logger } = require('../utils/logger');
+
+class CronController {
+  /**
+   * Setup all cron jobs
+   */
+  async setupCronJobs(req, res) {
+    try {
+      const result = await supabaseCronService.setupCronJobs();
+      
+      res.json({
+        success: true,
+        message: 'Cron jobs setup completed',
+        data: result
+      });
+    } catch (error) {
+      logger.error('Error in setupCronJobs controller:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to setup cron jobs',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * Create cron functions in database
+   */
+  async createCronFunctions(req, res) {
+    try {
+      const result = await supabaseCronService.createCronFunctions();
+      
+      res.json({
+        success: true,
+        message: 'Cron functions created successfully',
+        data: result
+      });
+    } catch (error) {
+      logger.error('Error in createCronFunctions controller:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to create cron functions',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * List all cron jobs
+   */
+  async listCronJobs(req, res) {
+    try {
+      const result = await supabaseCronService.listCronJobs();
+      
+      res.json({
+        success: true,
+        data: result.data
+      });
+    } catch (error) {
+      logger.error('Error in listCronJobs controller:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to list cron jobs',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * Test a specific cron job
+   */
+  async testCronJob(req, res) {
+    try {
+      const { jobName } = req.params;
+      const result = await supabaseCronService.testCronJob(jobName);
+      
+      res.json({
+        success: true,
+        message: `Cron job '${jobName}' tested successfully`,
+        data: result
+      });
+    } catch (error) {
+      logger.error(`Error in testCronJob controller for job ${req.params.jobName}:`, error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to test cron job',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * Get cron job status and logs
+   */
+  async getCronJobStatus(req, res) {
+    try {
+      const result = await supabaseCronService.getCronJobStatus();
+      
+      res.json({
+        success: true,
+        data: result.data
+      });
+    } catch (error) {
+      logger.error('Error in getCronJobStatus controller:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to get cron job status',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * Delete a cron job
+   */
+  async deleteCronJob(req, res) {
+    try {
+      const { jobName } = req.params;
+      const result = await supabaseCronService.deleteCronJob(jobName);
+      
+      res.json({
+        success: true,
+        message: `Cron job '${jobName}' deleted successfully`,
+        data: result
+      });
+    } catch (error) {
+      logger.error(`Error in deleteCronJob controller for job ${req.params.jobName}:`, error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to delete cron job',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+
+  /**
+   * Initialize complete cron setup (functions + jobs)
+   */
+  async initializeCronSetup(req, res) {
+    try {
+      logger.info('Starting complete cron setup initialization...');
+      
+      // First create the database functions
+      await supabaseCronService.createCronFunctions();
+      
+      // Then setup the cron jobs
+      const result = await supabaseCronService.setupCronJobs();
+      
+      res.json({
+        success: true,
+        message: 'Complete cron setup initialized successfully',
+        data: result
+      });
+    } catch (error) {
+      logger.error('Error in initializeCronSetup controller:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to initialize cron setup',
+        error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+      });
+    }
+  }
+}
+
+module.exports = new CronController();
