@@ -54,16 +54,14 @@ jobs:
           echo "Docker Compose version:"
           docker-compose --version
           
-          # Create project directory
+          # Remove existing directory completely
+          rm -rf /var/www/huawei
+          
+          # Create fresh project directory
           mkdir -p /var/www/huawei
           cd /var/www/huawei
           
-          # Remove existing directory if exists
-          if [ -d ".git" ]; then
-            rm -rf .git
-          fi
-          
-          # Clone repository
+          # Clone repository fresh
           git clone https://github.com/Radiit/huawei-employee-management.git .
           
           # Create .env file
@@ -88,19 +86,34 @@ jobs:
           # Stop existing containers
           docker-compose down || true
           
+          # Show current directory and files
+          echo "Current directory: $(pwd)"
+          echo "Files in directory:"
+          ls -la
+          
+          # Check if docker-compose.yml exists
+          if [ ! -f "docker-compose.yml" ]; then
+            echo "docker-compose.yml not found!"
+            exit 1
+          fi
+          
           # Build and start containers
           docker-compose up -d --build
           
           # Show container status
+          echo "Container status:"
           docker-compose ps
           
           # Show logs
+          echo "API container logs:"
           docker-compose logs api
           
           # Check if containers are running
           if ! docker-compose ps | grep -q "Up"; then
             echo "No containers are running, showing all logs:"
             docker-compose logs
+            echo "Docker Compose config:"
+            docker-compose config
             exit 1
           fi
           
