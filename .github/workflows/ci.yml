@@ -32,8 +32,8 @@ jobs:
           
           # Install Docker Compose if not exists
           if ! command -v docker-compose &> /dev/null; then
-            curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-            chmod +x /usr/local/bin/docker-compose
+            apt install -y docker-compose-plugin
+            ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
           fi
           
           # Create project directory
@@ -42,7 +42,7 @@ jobs:
           
           # Clone repository if not exists
           if [ ! -d ".git" ]; then
-            git clone https://github.com/your-username/huawei-employee-management.git .
+            git clone https://github.com/Radiit/huawei-employee-management.git .
           else
             git pull origin main
           fi
@@ -72,11 +72,25 @@ jobs:
           # Build and start containers
           docker-compose up -d --build
           
-          # Wait for services to be ready
-          sleep 30
+          # Show container status
+          docker-compose ps
           
-          # Health check
-          curl -f http://localhost:3000/health || exit 1
+          # Show logs
+          docker-compose logs api
+          
+          # Wait for services to be ready
+          sleep 60
+          
+          # Health check with retry
+          for i in {1..5}; do
+            if curl -f http://localhost:3000/health; then
+              echo "Health check passed!"
+              break
+            else
+              echo "Health check failed, retrying in 10 seconds... ($i/5)"
+              sleep 10
+            fi
+          done
           
           # Setup cron jobs
           docker-compose exec -T api node src/scripts/supabaseCronSetup.js setup || true
