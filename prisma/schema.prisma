@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  firstName    String   @map("first_name")
+  lastName     String   @map("last_name")
+  isActive     Boolean  @default(true) @map("is_active")
+  lastLogin    DateTime? @map("last_login")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  userRoles UserRole[]
+  sessions  Session[]
+
+  @@map("users")
+}
+
+model Role {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  resource    String
+  action      String
+  description String
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model UserRole {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  roleId    Int      @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@map("user_roles")
+}
+
+model RolePermission {
+  id           Int @id @default(autoincrement())
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+model Employee {
+  id              Int      @id @default(autoincrement())
+  name            String
+  position        String
+  joinDate        String   @map("join_date")
+  releaseDate     String?  @map("release_date")
+  experienceYears Float    @map("experience_years")
+  salary          Int
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@unique([name, position])
+  @@map("employees")
+}
+
+model DataCollection {
+  id            Int      @id @default(autoincrement())
+  collectionDate String  @map("collection_date")
+  collectionTime String  @map("collection_time")
+  dataSource    String   @map("data_source")
+  dataContent   String   @map("data_content")
+  filePath      String?  @map("file_path")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("data_collections")
+}
+
+model Session {
+  id        String   @id
+  userId    Int      @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
