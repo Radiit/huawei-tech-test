@@ -12,13 +12,13 @@ class SupabaseCronController {
       
       const cronJobs = await this.prisma.$queryRaw`
         SELECT 
-          jobid,
+          jobid::text as jobid,
           jobname,
           schedule,
           command,
           active,
           nodename,
-          nodeport,
+          nodeport::text as nodeport,
           database,
           username
         FROM cron.job 
@@ -34,7 +34,7 @@ class SupabaseCronController {
 
       const recentCollections = await this.prisma.$queryRaw`
         SELECT 
-          id,
+          id::text as id,
           collection_date,
           collection_time,
           file_path,
@@ -47,14 +47,21 @@ class SupabaseCronController {
       res.json({
         success: true,
         data: {
-          cronJobs: cronJobs,
+          cronJobs: cronJobs.map(job => ({
+            ...job,
+            jobid: job.jobid.toString(),
+            nodeport: job.nodeport ? job.nodeport.toString() : null
+          })),
           totalJobs: cronJobs.length,
           activeJobs: cronJobs.filter(job => job.active).length,
           dataCollections: {
             total: parseInt(dataCollections[0].total_collections),
             lastCollection: dataCollections[0].last_collection
           },
-          recentCollections: recentCollections
+          recentCollections: recentCollections.map(collection => ({
+            ...collection,
+            id: collection.id.toString()
+          }))
         }
       });
 

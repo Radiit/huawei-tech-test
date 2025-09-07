@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # Main API service
+  api:
+    build: .
+    container_name: huawei-employee-api
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+      - DB_PATH=/app/data/employees.db
+      - CRON_DATA_PATH=/home/cron
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./cron-data:/home/cron
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Cron management service (uses Supabase pg_cron)
+  cron-manager:
+    build: .
+    container_name: huawei-cron-manager
+    command: node src/scripts/supabaseCronManager.js
+    environment:
+      - NODE_ENV=production
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - LOG_LEVEL=info
+    volumes:
+      - ./logs:/app/logs
+    restart: "no"
+    depends_on:
+      - api
+
+  # Data collector service (manual trigger)
+  data-collector:
+    build: .
+    container_name: huawei-data-collector
+    command: node src/scripts/dataCollector.js
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/employees.db
+      - CRON_DATA_PATH=/home/cron
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./cron-data:/home/cron
+    restart: "no"
+    depends_on:
+      - api
+
+  # Data cleanup service (manual trigger)
+  data-cleanup:
+    build: .
+    container_name: huawei-data-cleanup
+    command: node src/scripts/dataCleanup.js
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/employees.db
+      - CRON_DATA_PATH=/home/cron
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./cron-data:/home/cron
+    restart: "no"
+    depends_on:
+      - api
+
+  # SQL queries service (manual trigger)
+  sql-queries:
+    build: .
+    container_name: huawei-sql-queries
+    command: node src/scripts/prismaSqlQueries.js all
+    environment:
+      - NODE_ENV=production
+      - DB_PATH=/app/data/employees.db
+      - LOG_LEVEL=info
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: "no"
+    depends_on:
+      - api
+
+volumes:
+  data:
+  logs:
+  cron-data:
+
