@@ -47,12 +47,32 @@ jobs:
           echo "Directory contents:"
           ls -la
           
-          # Setup git config
-          git config --global user.email "radityaaydin@gmail.com"
-          git config --global user.name "Deploy Bot"
+          # Download repository as zip
+          curl -L https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip -o huawei.zip
           
-          # Clone repository
-          git clone https://github.com/Radiit/huawei-employee-management.git huawei
+          # Check if download was successful
+          if [ ! -f "huawei.zip" ] || [ ! -s "huawei.zip" ]; then
+            echo "Failed to download repository"
+            exit 1
+          fi
+          
+          # Extract zip
+          unzip huawei.zip
+          
+          # Find the extracted directory
+          EXTRACTED_DIR=$(find . -maxdepth 1 -type d -name "huawei-employee-management-main" | head -1)
+          
+          if [ -z "$EXTRACTED_DIR" ]; then
+            echo "Failed to find extracted directory"
+            ls -la
+            exit 1
+          fi
+          
+          # Rename to huawei
+          mv "$EXTRACTED_DIR" huawei
+          
+          # Clean up zip file
+          rm huawei.zip
           
           # Change to project directory
           cd huawei
