@@ -10,7 +10,15 @@ class AuthController {
       res.status(201).json({
         success: true,
         message: 'User registered successfully',
-        data: user.toJSON()
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isActive: user.isActive,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        }
       });
     } catch (error) {
       logger.error('Error in register controller:', error);
@@ -67,9 +75,32 @@ class AuthController {
       res.json({
         success: true,
         data: {
-          user: user.toJSON(),
-          roles: roles.map(role => role.toJSON()),
-          permissions: permissions.map(permission => permission.toJSON())
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            isActive: user.isActive,
+            lastLogin: user.lastLogin,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+          },
+          roles: roles.map(role => ({
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            createdAt: role.createdAt,
+            updatedAt: role.updatedAt
+          })),
+          permissions: permissions.map(permission => ({
+            id: permission.id,
+            name: permission.name,
+            description: permission.description,
+            resource: permission.resource,
+            action: permission.action,
+            createdAt: permission.createdAt,
+            updatedAt: permission.updatedAt
+          }))
         }
       });
     } catch (error) {
@@ -90,7 +121,16 @@ class AuthController {
       res.json({
         success: true,
         message: 'Profile updated successfully',
-        data: user.toJSON()
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        }
       });
     } catch (error) {
       logger.error('Error in updateProfile controller:', error);
@@ -173,7 +213,16 @@ class AuthController {
       
       res.json({
         success: true,
-        data: users.map(user => user.toJSON()),
+        data: users.map(user => ({
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        })),
         pagination: {
           page: parseInt(page),
           limit: parseInt(limit),
@@ -207,8 +256,23 @@ class AuthController {
       res.json({
         success: true,
         data: {
-          user: user.toJSON(),
-          roles: roles.map(role => role.toJSON())
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            isActive: user.isActive,
+            lastLogin: user.lastLogin,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt
+          },
+          roles: roles.map(role => ({
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            createdAt: role.createdAt,
+            updatedAt: role.updatedAt
+          }))
         }
       });
     } catch (error) {
@@ -229,7 +293,16 @@ class AuthController {
       res.json({
         success: true,
         message: 'User updated successfully',
-        data: user.toJSON()
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        }
       });
     } catch (error) {
       logger.error(`Error in updateUser controller for ID ${req.params.id}:`, error);

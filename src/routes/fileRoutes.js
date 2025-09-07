@@ -4,7 +4,6 @@ const { authenticate, canManageFiles } = require('../middleware/authMiddleware')
 
 const router = express.Router();
 
-// File upload routes
 router.post('/employees/:employeeId/documents', 
   authenticate, 
   canManageFiles, 
@@ -19,7 +18,6 @@ router.post('/users/:userId/profile-picture',
   FileController.uploadProfilePicture
 );
 
-// File management routes
 router.get('/files', 
   authenticate, 
   FileController.listFiles
@@ -41,7 +39,6 @@ router.delete('/files/:fileId',
   FileController.deleteFile
 );
 
-// Storage health check
 router.get('/storage/health', 
   authenticate, 
   FileController.getStorageHealth
