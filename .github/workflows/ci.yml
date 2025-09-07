@@ -51,6 +51,17 @@ jobs:
           git config --global user.email "radityaaydin@gmail.com"
           git config --global user.name "Deploy Bot"
           
+          # Configure git to use HTTPS instead of SSH for cloning
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          
+          # Test repository accessibility
+          echo "Testing repository accessibility..."
+          if curl -s -o /dev/null -w "%{http_code}" https://github.com/Radiit/huawei-tech-test | grep -q "200"; then
+            echo "Repository is accessible"
+          else
+            echo "WARNING: Repository might not be accessible"
+          fi
+          
           # Try to pull if directory exists, otherwise clone
           if [ -d "huawei" ] && [ -d "huawei/.git" ]; then
             echo "Directory exists, trying to pull..."
@@ -58,16 +69,49 @@ jobs:
             git pull origin main
           else
             echo "Directory doesn't exist, cloning..."
-            git clone https://github.com/Radiit/huawei-employee-management.git huawei
+            echo "Cloning repository: https://github.com/Radiit/huawei-tech-test.git"
+            if git clone https://github.com/Radiit/huawei-tech-test.git huawei; then
+              echo "Repository cloned successfully"
+            else
+              echo "Failed to clone repository, trying alternative method..."
+              # Try with SSH if HTTPS fails
+              git clone git@github.com:Radiit/huawei-tech-test.git huawei
+            fi
             cd huawei
           fi
           
-          # Verify files
+          # Verify we're in the correct directory and files exist
+          echo "Current directory after clone: $(pwd)"
+          echo "Directory contents after clone:"
+          ls -la
+          
+          # Check if we're in the huawei directory
+          if [ ! -d "huawei" ]; then
+            echo "ERROR: huawei directory not found after clone"
+            exit 1
+          fi
+          
+          cd huawei
+          echo "Current directory after cd huawei: $(pwd)"
+          echo "Contents of huawei directory:"
+          ls -la
+          
+          # Verify essential files
           if [ ! -f "Dockerfile" ]; then
-            echo "Dockerfile not found after clone"
+            echo "ERROR: Dockerfile not found after clone"
+            echo "Available files:"
             ls -la
             exit 1
           fi
+          
+          if [ ! -f "package.json" ]; then
+            echo "ERROR: package.json not found after clone"
+            echo "Available files:"
+            ls -la
+            exit 1
+          fi
+          
+          echo "All essential files found successfully"
           
           # Create .env file
           cat > .env << EOF
