@@ -64,12 +64,8 @@ jobs:
           mkdir -p /var/www/huawei
           cd /var/www/huawei
           
-          # Download repository as zip
-          curl -L https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip -o main.zip
-          unzip main.zip
-          mv huawei-employee-management-main/* .
-          mv huawei-employee-management-main/.* . 2>/dev/null || true
-          rm -rf huawei-employee-management-main main.zip
+          # Clone repository
+          git clone https://github.com/Radiit/huawei-employee-management.git .
           
           # Create .env file
           cat > .env << EOF
