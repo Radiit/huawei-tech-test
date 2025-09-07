@@ -70,12 +70,25 @@ jobs:
           else
             echo "Directory doesn't exist, cloning..."
             echo "Cloning repository: https://github.com/Radiit/huawei-tech-test.git"
-            if git clone https://github.com/Radiit/huawei-tech-test.git huawei; then
+            
+            # Remove any existing files that might interfere
+            rm -rf huawei-tech-test
+            
+            if git clone https://github.com/Radiit/huawei-tech-test.git; then
               echo "Repository cloned successfully"
+              # Rename the cloned directory to huawei for consistency
+              if [ -d "huawei-tech-test" ]; then
+                mv huawei-tech-test huawei
+                echo "Renamed huawei-tech-test to huawei"
+              fi
             else
               echo "Failed to clone repository, trying alternative method..."
               # Try with SSH if HTTPS fails
-              git clone git@github.com:Radiit/huawei-tech-test.git huawei
+              git clone git@github.com:Radiit/huawei-tech-test.git
+              if [ -d "huawei-tech-test" ]; then
+                mv huawei-tech-test huawei
+                echo "Renamed huawei-tech-test to huawei"
+              fi
             fi
             cd huawei
           fi
@@ -85,15 +98,21 @@ jobs:
           echo "Directory contents after clone:"
           ls -la
           
-          # Check if we're in the huawei directory
-          if [ ! -d "huawei" ]; then
-            echo "ERROR: huawei directory not found after clone"
+          # Check if we're in the huawei directory or if files are in current directory
+          if [ -d "huawei" ]; then
+            echo "Found huawei subdirectory, changing to it"
+            cd huawei
+          elif [ -f "package.json" ] && [ -f "Dockerfile" ]; then
+            echo "Repository files found in current directory, staying here"
+          else
+            echo "ERROR: Neither huawei directory nor repository files found"
+            echo "Available files:"
+            ls -la
             exit 1
           fi
           
-          cd huawei
-          echo "Current directory after cd huawei: $(pwd)"
-          echo "Contents of huawei directory:"
+          echo "Current working directory: $(pwd)"
+          echo "Contents of working directory:"
           ls -la
           
           # Verify essential files
