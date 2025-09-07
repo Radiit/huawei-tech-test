@@ -19,13 +19,10 @@ jobs:
         password: ${{ secrets.VPS_PASSWORD }}
         port: 22
         script: |
-          # Update system
+          # Update system and install Docker
           apt update -y
+          apt install -y curl git
           
-          # Install required packages
-          apt install -y unzip curl git wget
-          
-          # Install Docker if not exists
           if ! command -v docker &> /dev/null; then
             curl -fsSL https://get.docker.com -o get-docker.sh
             sh get-docker.sh
@@ -33,106 +30,16 @@ jobs:
             systemctl enable docker
           fi
           
-          # Ensure /var/www directory exists
+          # Setup project directory
           mkdir -p /var/www
-          
-          # Remove existing directory completely
-          rm -rf /var/www/huawei
-          
-          # Change to /var/www directory
           cd /var/www
+          rm -rf huawei
           
-          # Verify we're in the right directory
-          echo "Current directory: $(pwd)"
-          echo "Directory contents:"
-          ls -la
+          # Clone repository
+          git clone https://github.com/Radiit/huawei-tech-test.git huawei
+          cd huawei
           
-          # Setup git config
-          git config --global user.email "radityaaydin@gmail.com"
-          git config --global user.name "Deploy Bot"
-          
-          # Configure git to use HTTPS instead of SSH for cloning
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          
-          # Test repository accessibility
-          echo "Testing repository accessibility..."
-          if curl -s -o /dev/null -w "%{http_code}" https://github.com/Radiit/huawei-tech-test | grep -q "200"; then
-            echo "Repository is accessible"
-          else
-            echo "WARNING: Repository might not be accessible"
-          fi
-          
-          # Try to pull if directory exists, otherwise clone
-          if [ -d "huawei" ] && [ -d "huawei/.git" ]; then
-            echo "Directory exists, trying to pull..."
-            cd huawei
-            git pull origin main
-          else
-            echo "Directory doesn't exist, cloning..."
-            echo "Cloning repository: https://github.com/Radiit/huawei-tech-test.git"
-            
-            # Remove any existing files that might interfere
-            rm -rf huawei-tech-test
-            
-            if git clone https://github.com/Radiit/huawei-tech-test.git; then
-              echo "Repository cloned successfully"
-              # Rename the cloned directory to huawei for consistency
-              if [ -d "huawei-tech-test" ]; then
-                mv huawei-tech-test huawei
-                echo "Renamed huawei-tech-test to huawei"
-              fi
-            else
-              echo "Failed to clone repository, trying alternative method..."
-              # Try with SSH if HTTPS fails
-              git clone git@github.com:Radiit/huawei-tech-test.git
-              if [ -d "huawei-tech-test" ]; then
-                mv huawei-tech-test huawei
-                echo "Renamed huawei-tech-test to huawei"
-              fi
-            fi
-            cd huawei
-          fi
-          
-          # Verify we're in the correct directory and files exist
-          echo "Current directory after clone: $(pwd)"
-          echo "Directory contents after clone:"
-          ls -la
-          
-          # Check if we're in the huawei directory or if files are in current directory
-          if [ -d "huawei" ]; then
-            echo "Found huawei subdirectory, changing to it"
-            cd huawei
-          elif [ -f "package.json" ] && [ -f "Dockerfile" ]; then
-            echo "Repository files found in current directory, staying here"
-          else
-            echo "ERROR: Neither huawei directory nor repository files found"
-            echo "Available files:"
-            ls -la
-            exit 1
-          fi
-          
-          echo "Current working directory: $(pwd)"
-          echo "Contents of working directory:"
-          ls -la
-          
-          # Verify essential files
-          if [ ! -f "Dockerfile" ]; then
-            echo "ERROR: Dockerfile not found after clone"
-            echo "Available files:"
-            ls -la
-            exit 1
-          fi
-          
-          if [ ! -f "package.json" ]; then
-            echo "ERROR: package.json not found after clone"
-            echo "Available files:"
-            ls -la
-            exit 1
-          fi
-          
-          echo "All essential files found successfully"
-          
-          # Create .env file
+          # Create environment file
           cat > .env << EOF
           NODE_ENV=production
           PORT=3000
@@ -151,18 +58,14 @@ jobs:
           LOG_LEVEL=info
           EOF
           
-          # Stop existing container
+          # Deploy application
           docker stop huawei-api || true
           docker rm huawei-api || true
-          
-          # Build and run container
           docker build -t huawei-api .
           docker run -d --name huawei-api -p 3000:3000 --env-file .env --restart unless-stopped huawei-api
           
-          # Wait for service to be ready
+          # Wait and verify deployment
           sleep 30
-          
-          # Health check
           curl -f http://localhost:3000/health || exit 1
           
           # Setup cron jobs
