@@ -22,6 +22,9 @@ jobs:
           # Update system
           apt update -y
           
+          # Install required packages
+          apt install -y unzip curl
+          
           # Install Docker if not exists
           if ! command -v docker &> /dev/null; then
             curl -fsSL https://get.docker.com -o get-docker.sh
@@ -61,8 +64,12 @@ jobs:
           mkdir -p /var/www/huawei
           cd /var/www/huawei
           
-          # Clone repository fresh
-          git clone https://github.com/Radiit/huawei-employee-management.git .
+          # Download repository as zip
+          curl -L https://github.com/Radiit/huawei-employee-management/archive/refs/heads/main.zip -o main.zip
+          unzip main.zip
+          mv huawei-employee-management-main/* .
+          mv huawei-employee-management-main/.* . 2>/dev/null || true
+          rm -rf huawei-employee-management-main main.zip
           
           # Create .env file
           cat > .env << EOF
