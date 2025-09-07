@@ -2,9 +2,6 @@ const supabaseCronService = require('../services/supabaseCronService');
 const { logger } = require('../utils/logger');
 
 class CronController {
-  /**
-   * Setup all cron jobs
-   */
   async setupCronJobs(req, res) {
     try {
       const result = await supabaseCronService.setupCronJobs();
@@ -24,9 +21,6 @@ class CronController {
     }
   }
 
-  /**
-   * Create cron functions in database
-   */
   async createCronFunctions(req, res) {
     try {
       const result = await supabaseCronService.createCronFunctions();
@@ -46,9 +40,6 @@ class CronController {
     }
   }
 
-  /**
-   * List all cron jobs
-   */
   async listCronJobs(req, res) {
     try {
       const result = await supabaseCronService.listCronJobs();
@@ -67,9 +58,6 @@ class CronController {
     }
   }
 
-  /**
-   * Test a specific cron job
-   */
   async testCronJob(req, res) {
     try {
       const { jobName } = req.params;
@@ -90,9 +78,6 @@ class CronController {
     }
   }
 
-  /**
-   * Get cron job status and logs
-   */
   async getCronJobStatus(req, res) {
     try {
       const result = await supabaseCronService.getCronJobStatus();
@@ -111,9 +96,6 @@ class CronController {
     }
   }
 
-  /**
-   * Delete a cron job
-   */
   async deleteCronJob(req, res) {
     try {
       const { jobName } = req.params;
@@ -134,9 +116,6 @@ class CronController {
     }
   }
 
-  /**
-   * Initialize complete cron setup (functions + jobs)
-   */
   async initializeCronSetup(req, res) {
     try {
       logger.info('Starting complete cron setup initialization...');
