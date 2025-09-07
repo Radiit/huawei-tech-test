@@ -32,20 +32,39 @@ jobs:
           
           # Install Docker Compose if not exists
           if ! command -v docker-compose &> /dev/null; then
+            echo "Installing Docker Compose..."
             apt install -y docker-compose-plugin
-            ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+            # Try different paths for docker-compose
+            if [ -f "/usr/libexec/docker/cli-plugins/docker-compose" ]; then
+              ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+              echo "Docker Compose installed via plugin (libexec)"
+            elif [ -f "/usr/lib/docker/cli-plugins/docker-compose" ]; then
+              ln -s /usr/lib/docker/cli-plugins/docker-compose /usr/local/bin/docker-compose
+              echo "Docker Compose installed via plugin (lib)"
+            else
+              # Fallback to standalone docker-compose
+              echo "Installing standalone Docker Compose..."
+              curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+              chmod +x /usr/local/bin/docker-compose
+              echo "Docker Compose installed standalone"
+            fi
           fi
+          
+          # Verify Docker Compose installation
+          echo "Docker Compose version:"
+          docker-compose --version
           
           # Create project directory
           mkdir -p /var/www/huawei
           cd /var/www/huawei
           
-          # Clone repository if not exists
-          if [ ! -d ".git" ]; then
-            git clone https://github.com/Radiit/huawei-employee-management.git .
-          else
-            git pull origin main
+          # Remove existing directory if exists
+          if [ -d ".git" ]; then
+            rm -rf .git
           fi
+          
+          # Clone repository
+          git clone https://github.com/Radiit/huawei-employee-management.git .
           
           # Create .env file
           cat > .env << EOF
@@ -77,6 +96,13 @@ jobs:
           
           # Show logs
           docker-compose logs api
+          
+          # Check if containers are running
+          if ! docker-compose ps | grep -q "Up"; then
+            echo "No containers are running, showing all logs:"
+            docker-compose logs
+            exit 1
+          fi
           
           # Wait for services to be ready
           sleep 60
