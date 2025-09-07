@@ -1,0 +1,66 @@
+{
+  "name": "huawei-employee-management",
+  "version": "1.0.0",
+  "description": "Employee Management System with Data Collection Automation",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write src/",
+    "cron:collect": "node src/scripts/dataCollector.js",
+    "cron:cleanup": "node src/scripts/dataCleanup.js",
+    "seed": "node src/scripts/prismaSeeder.js",
+    "seed:reset": "node src/scripts/prismaSeeder.js reset",
+    "db:generate": "npx prisma generate",
+    "db:push": "npx prisma db push",
+    "db:studio": "npx prisma studio",
+    "sql:queries": "node src/scripts/prismaSqlQueries.js all",
+    "sql:list": "node src/scripts/prismaSqlQueries.js list"
+  },
+  "keywords": [
+    "express",
+    "nodejs",
+    "employee-management",
+    "api",
+    "cron",
+    "automation"
+  ],
+  "author": "Huawei Assignment",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "@supabase/supabase-js": "^2.57.2",
+    "axios": "^1.6.2",
+    "bcrypt": "^5.1.1",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "node-cron": "^3.0.3",
+    "pg": "^8.16.3",
+    "sqlite3": "^5.1.6",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.55.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.1.1",
+    "prisma": "^6.15.0",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
