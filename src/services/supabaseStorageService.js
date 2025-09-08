@@ -204,7 +204,7 @@ class SupabaseStorageService {
   async healthCheck() {
     try {
       await this.listFiles();
-      return { status: 'healthy'm, service: 'supabase_storage' };
+      return { status: 'healthy', service: 'supabase_storage' };
     } catch (error) {
       logger.error('Supabase Storage health check failed:', error);
       return { status: 'unhealthy', service: 'supabase_storage', error: error.message };

@@ -64,9 +64,30 @@ jobs:
           docker build -t huawei-api .
           docker run -d --name huawei-api -p 3000:3000 --env-file .env --restart unless-stopped huawei-api
           
-          # Wait and verify deployment
-          sleep 30
-          curl -f http://localhost:3000/health || exit 1
+          # Wait for container to start and check logs
+          echo "Waiting for container to start..."
+          sleep 10
+          
+          # Check if container is running
+          if ! docker ps | grep -q huawei-api; then
+            echo "Container failed to start. Checking logs:"
+            docker logs huawei-api
+            exit 1
+          fi
+          
+          # Wait for application to be ready
+          echo "Waiting for application to be ready..."
+          for i in {1..30}; do
+            if curl -f http://localhost:3000/health >/dev/null 2>&1; then
+              echo "Health check passed!"
+              break
+            fi
+            echo "Attempt $i/30: Health check failed, waiting..."
+            sleep 2
+          done
+          
+          # Final health check
+          curl -f http://localhost:3000/health || (echo "Final health check failed. Container logs:" && docker logs huawei-api && exit 1)
           
           # Setup cron jobs
           docker exec huawei-api node src/scripts/supabaseCronSetup.js setup || true
