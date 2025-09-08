@@ -13,7 +13,6 @@ class Employee {
     this.updatedAt = data.updated_at;
   }
 
-  // Validation rules for employee data
   static getValidationRules() {
     return [
       body('name')
@@ -53,7 +52,6 @@ class Employee {
     ];
   }
 
-  // Validate employee data
   static validate(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -66,7 +64,6 @@ class Employee {
     next();
   }
 
-  // Convert to JSON format for API response
   toJSON() {
     return {
       id: this.id,
@@ -81,12 +78,10 @@ class Employee {
     };
   }
 
-  // Create from database row
   static fromDBRow(row) {
     return new Employee(row);
   }
 
-  // Convert to database format
   toDBFormat() {
     return {
       name: this.name,

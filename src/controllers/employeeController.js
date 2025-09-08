@@ -2,7 +2,6 @@ const employeeService = require('../services/prismaEmployeeService');
 const { logger } = require('../utils/logger');
 
 class EmployeeController {
-  // Get all employees
   async getAllEmployees(req, res) {
     try {
       const { position, min_experience, max_experience, page = 1, limit = 10, sort_by = 'createdAt', sort_order = 'desc' } = req.query;
@@ -40,7 +39,6 @@ class EmployeeController {
     }
   }
 
-  // Get employee by ID
   async getEmployeeById(req, res) {
     try {
       const { id } = req.params;
@@ -67,7 +65,6 @@ class EmployeeController {
     }
   }
 
-  // Create new employee
   async createEmployee(req, res) {
     try {
       const employee = await employeeService.createEmployee(req.body);
@@ -87,7 +84,6 @@ class EmployeeController {
     }
   }
 
-  // Update employee
   async updateEmployee(req, res) {
     try {
       const { id } = req.params;
@@ -116,7 +112,6 @@ class EmployeeController {
     }
   }
 
-  // Delete employee
   async deleteEmployee(req, res) {
     try {
       const { id } = req.params;
@@ -144,7 +139,6 @@ class EmployeeController {
     }
   }
 
-  // Get employees by position
   async getEmployeesByPosition(req, res) {
     try {
       const { position } = req.params;
@@ -164,7 +158,6 @@ class EmployeeController {
     }
   }
 
-  // Get total salary for year
   async getTotalSalaryForYear(req, res) {
     try {
       const { year } = req.params;
@@ -187,7 +180,6 @@ class EmployeeController {
     }
   }
 
-  // Get top employees by experience
   async getTopEmployeesByExperience(req, res) {
     try {
       const { limit = 3 } = req.query;
@@ -207,7 +199,6 @@ class EmployeeController {
     }
   }
 
-  // Get engineers with low experience
   async getEngineersWithLowExperience(req, res) {
     try {
       const employees = await employeeService.getEngineersWithLowExperience();
@@ -226,7 +217,6 @@ class EmployeeController {
     }
   }
 
-  // Update engineer salary
   async updateEngineerSalary(req, res) {
     try {
       const { salary } = req.body;
