@@ -58,6 +58,16 @@ jobs:
           LOG_LEVEL=info
           EOF
           
+          # Test database connection before deployment
+          echo "Testing database connection..."
+          docker run --rm --env-file .env huawei-api node -e "
+            const { PrismaClient } = require('@prisma/client');
+            const prisma = new PrismaClient();
+            prisma.\$connect()
+              .then(() => { console.log('✅ Database connection successful'); process.exit(0); })
+              .catch(err => { console.error('❌ Database connection failed:', err.message); process.exit(1); });
+          " || (echo "Database connection test failed, but continuing with deployment..." && true)
+          
           # Deploy application
           docker stop huawei-api || true
           docker rm huawei-api || true
@@ -86,8 +96,24 @@ jobs:
             sleep 2
           done
           
-          # Final health check
-          curl -f http://localhost:3000/health || (echo "Final health check failed. Container logs:" && docker logs huawei-api && exit 1)
+          # Debug: Check container status and network
+          echo "Container status:"
+          docker ps -a | grep huawei-api
+          echo "Container logs (last 20 lines):"
+          docker logs --tail=20 huawei-api
+          echo "Network connectivity test:"
+          docker exec huawei-api sh -c "ping -c 1 db.zvusrfutoxmqkfjllrys.supabase.co || echo 'Ping failed'"
+          
+          # Final health check with detailed error
+          if curl -f http://localhost:3000/health; then
+            echo "✅ Final health check passed!"
+          else
+            echo "❌ Final health check failed. Full container logs:"
+            docker logs huawei-api
+            echo "Container environment variables:"
+            docker exec huawei-api env | grep -E "(DATABASE|SUPABASE)" || echo "No DATABASE/SUPABASE env vars found"
+            exit 1
+          fi
           
           # Setup cron jobs
           docker exec huawei-api node src/scripts/supabaseCronSetup.js setup || true

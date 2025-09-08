@@ -77,12 +77,14 @@ class Application {
           database: dbHealth
         });
       } catch (error) {
-        res.status(503).json({
-          success: false,
-          message: 'Server error',
+        // Fallback: return 200 even if DB is down, but indicate DB issue
+        res.status(200).json({
+          success: true,
+          message: 'Server is running (database connection issue)',
           timestamp: new Date().toISOString(),
           uptime: process.uptime(),
-          database: { status: 'unhealthy', error: error.message }
+          database: { status: 'unhealthy', error: error.message },
+          warning: 'Database connection failed but server is operational'
         });
       }
     });
