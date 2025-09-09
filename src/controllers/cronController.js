@@ -2,6 +2,34 @@ const supabaseCronService = require('../services/supabaseCronService');
 const { logger } = require('../utils/logger');
 
 class CronController {
+  async createCustomCron(req, res) {
+    try {
+      const { jobName, schedule, command } = req.body || {};
+      if (!jobName || !schedule || !command) {
+        return res.status(400).json({ success: false, message: 'jobName, schedule, and command are required' });
+      }
+
+      const result = await supabaseCronService.createCronJob(jobName, schedule, command);
+      return res.json({ success: true, message: 'Custom cron created', data: result });
+    } catch (error) {
+      logger.error('Error in createCustomCron controller:', error);
+      return res.status(500).json({ success: false, message: 'Failed to create custom cron' });
+    }
+  }
+
+  async deleteCustomCron(req, res) {
+    try {
+      const { jobName } = req.params;
+      if (!jobName) {
+        return res.status(400).json({ success: false, message: 'jobName is required' });
+      }
+      const result = await supabaseCronService.deleteCronJob(jobName);
+      return res.json({ success: true, message: `Cron '${jobName}' deleted`, data: result });
+    } catch (error) {
+      logger.error('Error in deleteCustomCron controller:', error);
+      return res.status(500).json({ success: false, message: 'Failed to delete custom cron' });
+    }
+  }
   async setupCronJobs(req, res) {
     try {
       const result = await supabaseCronService.setupCronJobs();
