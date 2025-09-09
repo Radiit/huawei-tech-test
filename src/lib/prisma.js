@@ -4,6 +4,11 @@ const { logger } = require('../utils/logger');
 class PrismaService {
   constructor() {
     this.prisma = new PrismaClient({
+      datasources: {
+        db: {
+          url: process.env.DATABASE_URL,
+        },
+      },
       log: [
         {
           emit: 'event',
@@ -22,6 +27,11 @@ class PrismaService {
           level: 'warn',
         },
       ],
+      __internal: {
+        engine: {
+          binaryTargets: ['native'],
+        },
+      },
     });
 
     // Log queries in development
@@ -55,10 +65,14 @@ class PrismaService {
     try {
       await this.prisma.$connect();
       logger.info('Connected to PostgreSQL database via Prisma');
+      
+      await this.prisma.$queryRaw`SELECT 1 as test`;
+      logger.info('Database connection test successful');
     } catch (error) {
       logger.error('Failed to connect to database:', error);
-      throw error;
+      return false;
     }
+    return true;
   }
 
   async disconnect() {
@@ -73,7 +87,9 @@ class PrismaService {
 
   async healthCheck() {
     try {
-      await this.prisma.$queryRaw`SELECT 1`;
+      await this.prisma.user.findFirst({
+        select: { id: true }
+      });
       return { status: 'healthy', database: 'postgresql' };
     } catch (error) {
       logger.error('Database health check failed:', error);

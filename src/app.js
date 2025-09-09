@@ -28,6 +28,8 @@ class Application {
   }
 
   setupMiddleware() {
+    this.app.set('trust proxy', 1);
+
     // Security middleware
     this.app.use(helmet());
 
@@ -127,13 +129,19 @@ class Application {
 
   async start() {
     try {
-      // Connect to database
-      await prisma.connect();
+      const dbConnected = await prisma.connect();
+      if (!dbConnected) {
+        logger.warn('Database connection failed, but server will start anyway');
+      }
 
-      // Start server
       const server = this.app.listen(config.server.port, config.server.host, () => {
         logger.info(`Server running on http://${config.server.host}:${config.server.port}`);
         logger.info(`Environment: ${config.server.env}`);
+        if (dbConnected) {
+          logger.info('Database connection: OK');
+        } else {
+          logger.warn('Database connection: FAILED - some features may not work');
+        }
       });
 
       // Graceful shutdown
