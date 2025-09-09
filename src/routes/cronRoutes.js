@@ -16,5 +16,6 @@ router.get('/status', cronController.getCronJobStatus);
 router.post('/test/:jobName', cronController.testCronJob);
 router.delete('/jobs/:jobName', cronController.deleteCronJob);
 router.delete('/custom/:jobName', cronController.deleteCustomCron);
+router.post('/export/latest', cronController.exportLatestCollectionToStorage);
 
 module.exports = router;

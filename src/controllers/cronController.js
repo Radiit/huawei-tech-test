@@ -1,5 +1,7 @@
 const supabaseCronService = require('../services/supabaseCronService');
 const { logger } = require('../utils/logger');
+const prisma = require('../lib/prisma');
+const storage = require('../services/supabaseStorageService');
 
 class CronController {
   async createCustomCron(req, res) {
@@ -166,6 +168,32 @@ class CronController {
         message: 'Failed to initialize cron setup',
         error: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
       });
+    }
+  }
+
+  async exportLatestCollectionToStorage(req, res) {
+    try {
+      const latest = await prisma.client.dataCollection.findFirst({
+        orderBy: { createdAt: 'desc' }
+      });
+
+      if (!latest) {
+        return res.status(404).json({ success: false, message: 'No data_collections found' });
+      }
+
+      const now = new Date();
+      const wib = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
+      const pad = n => String(n).padStart(2, '0');
+      const fname = `cron_${pad(wib.getMonth()+1)}${pad(wib.getDate())}${wib.getFullYear()}_${pad(wib.getHours())}.${pad(wib.getMinutes())}.json`;
+      const path = `cron/${fname}`;
+
+      const payload = Buffer.from(JSON.stringify(latest, null, 2));
+      const uploaded = await storage.uploadFile({ buffer: payload, mimetype: 'application/json' }, path);
+
+      return res.json({ success: true, message: 'Latest data exported to storage', data: { uploaded, recordId: latest.id } });
+    } catch (error) {
+      logger.error('Error exporting latest collection to storage:', error);
+      return res.status(500).json({ success: false, message: 'Export failed', error: process.env.NODE_ENV==='development'? error.message : undefined });
     }
   }
 }
