@@ -1,64 +1,70 @@
 # Huawei Employee Management System
 
-A comprehensive Node.js/Express.js application for employee management with automated data collection and processing capabilities.
+    🚀 Demo: [huawei-tech-test.surge.sh](http://huawei-tech-test.surge.sh)
+
+    📝 API Docs: [Postman Documentation](https://documenter.getpostman.com/view/39299483/2sB3HnKf8f)
+
+## Tech Stack
+
+<p align="left">
+  <img alt="Node.js" src="https://img.shields.io/badge/Node.js-20.x-339933?logo=node.js&logoColor=white" />
+  <img alt="Express" src="https://img.shields.io/badge/Express.js-API-000000?logo=express&logoColor=white" />
+  <img alt="Prisma" src="https://img.shields.io/badge/Prisma-ORM-2D3748?logo=prisma&logoColor=white" />
+  <img alt="PostgreSQL" src="https://img.shields.io/badge/PostgreSQL-Supabase-4169E1?logo=postgresql&logoColor=white" />
+  <img alt="Supabase" src="https://img.shields.io/badge/Supabase-Storage-3ECF8E?logo=supabase&logoColor=white" />
+  <img alt="Render" src="https://img.shields.io/badge/Render-Hosting-46E3B7?logo=render&logoColor=black" />
+  <img alt="Surge" src="https://img.shields.io/badge/Surge-Frontend-000000?logo=surge&logoColor=white" />
+  <img alt="GitHub Actions" src="https://img.shields.io/badge/GitHub%20Actions-CI/CD-2088FF?logo=githubactions&logoColor=white" />
+</p>
 
 ## Features
 
-### 1. Backend Development
-- **RESTful API** built with Express.js
-- **Employee Management** with CRUD operations
-- **Data Validation** using express-validator
-- **SQLite Database** for data persistence
-- **Rate Limiting** and security middleware
-- **Structured Logging** with Winston
-- **Error Handling** with custom middleware
+### 1. Backend
+- Express.js REST API, JWT auth, RBAC middleware
+- Prisma ORM to Supabase Postgres (pgBouncer-ready)
+- CORS with allowlist, Helmet, Compression, Rate limiting
 
-### 2. Automation Testing
-- **Local Cron Jobs** for reliable system-level scheduling
-- **Data Collection** 3 times daily (08:00, 12:00, 15:00 WIB)
-- **JSON Export** with timestamped filenames
-- **Data Cleanup** for files older than 30 days
-- **Built-in Monitoring** with job status and logging
-- **Docker Integration** for containerized environments
+### 2. Automation (pg_cron)
+- Jobs: 08:00, 12:00, 15:00 WIB data collection; 02:00 WIB cleanup (DB)
+- Custom cron via RPC wrappers (`public.cron_schedule`, etc.)
+- Export latest collection to Supabase Storage as CSV (multi-row)
+- Status and run history via RPC list functions
 
 ### 3. Data Processing
-- **SQL Queries** for employee data analysis
-- **Salary Calculations** by year
-- **Experience-based Sorting**
-- **Position-based Filtering**
+- SQL scripts answering the assignment (insert/update/aggregate/subquery)
+- Equivalent Prisma implementations for API usage
 
 ## Project Structure
 
 ```
 huawei/
 ├── src/
-│   ├── config/          # Configuration files
-│   ├── controllers/     # Request handlers
-│   ├── middleware/      # Custom middleware
-│   ├── models/          # Data models
-│   ├── routes/          # API routes
-│   ├── scripts/         # Cron and utility scripts
-│   ├── services/        # Business logic
-│   └── utils/           # Utility functions
-├── data/                # SQLite database
-├── logs/                # Application logs
-├── cron-data/           # Collected data files
-├── public/              # Static assets
-├── tests/               # Test files
-├── docker-compose.yml   # Docker services
-├── Dockerfile          # Container configuration
-└── package.json        # Dependencies
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── scripts/         # SQL + Prisma scripts, cron helpers
+│   ├── services/        # prismaAuthService, supabaseCronService, storage
+│   └── utils/
+├── prisma/
+├── fe/                  # standalone frontend (Surge)
+├── logs/
+├── cron-data/
+├── docker-compose.yml
+├── Dockerfile
+└── package.json
 ```
 
 ## Prerequisites
 
-- Node.js 18+ 
-- Docker & Docker Compose (for containerized deployment)
-- Git
+- Node.js 20+
+- Docker & Docker Compose (optional)
+- Supabase project (URL + keys), Render account (optional)
 
-## Installation
+## Setup & Run
 
-### Local Development
+### Local (no Docker)
 
 1. **Clone the repository**
    ```bash
@@ -86,26 +92,32 @@ huawei/
    npm start
    ```
 
-### Docker Deployment
+### Single Docker container
 
-1. **Build and start services**
+1. Build
+   ```bash
+   docker build -t huawei-api .
+   docker run -p 3000:3000 --env-file .env huawei-api
+   ```
+
+2. View logs
+   ```bash
+   docker logs -f <container-id>
+   ```
+
+### Docker Compose (optional)
+1. Up
    ```bash
    docker-compose up -d
    ```
-
-2. **View logs**
-   ```bash
-   docker-compose logs -f api
-   ```
-
-3. **Stop services**
+2. Down
    ```bash
    docker-compose down
    ```
 
-## API Endpoints
+## API Endpoints (high-level)
 
-### Employee Management
+### Employees
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -115,7 +127,7 @@ huawei/
 | PUT | `/api/employees/:id` | Update employee |
 | DELETE | `/api/employees/:id` | Delete employee |
 
-### Data Analysis
+### Analytics
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -162,9 +174,14 @@ curl http://localhost:3000/api/employees/top-experience?limit=3
 curl http://localhost:3000/api/employees/salary/year/2021
 ```
 
-## Automation Scripts
+## Automation & Cron
 
-### Local Cron Jobs Management
+### Cron management via API (pg_cron wrappers)
+Use the Postman docs or collection in repo (`postman_collection.json`):
+- Initialize (create functions + setup jobs)
+- Create custom cron (jobName, schedule, command)
+- List jobs, Status, Test by name, Delete
+- Export latest to Storage (CSV)
 ```bash
 # Setup all cron jobs
 npm run cron:setup
@@ -182,66 +199,23 @@ npm run cron:collect
 npm run cron:cleanup
 ```
 
-### Manual Data Operations
-```bash
-# Manual data collection
-npm run cron:collect
-
-# Manual data cleanup
-npm run cron:cleanup-old
-
-# Or using Docker
-docker-compose run data-collector
-docker-compose run data-cleanup
-```
-
-### SQL Queries
-```bash
-# Run all SQL queries from requirement
-docker-compose run sql-queries
-```
-
 ## Cron Jobs
 
-The application uses local cron jobs for reliable scheduling:
+The application uses Postgres `pg_cron` on Supabase:
 
-- **Data Collection**: 08:00, 12:00, 15:00 WIB daily
-- **Data Cleanup**: 02:00 WIB daily (removes files >30 days old)
-- **System-level Scheduling**: More reliable than container cron
-- **Built-in Monitoring**: Job status and execution logs
-- **Easy Management**: Simple setup and monitoring commands
+- Data Collection: 08:00, 12:00, 15:00 WIB daily (writes `data_collections`)
+- Data Cleanup (DB): 02:00 WIB daily (deletes rows older than 30 days)
+- Storage cleanup: implement separately if you also want to delete old files
 
-See [CRON_SETUP_GUIDE.md](./CRON_SETUP_GUIDE.md) for detailed setup instructions.
-
-## Database Schema
+## Database Schema (Prisma logical model)
 
 ### Employees Table
-```sql
-CREATE TABLE employees (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT NOT NULL,
-  position TEXT NOT NULL,
-  join_date TEXT NOT NULL,
-  release_date TEXT,
-  experience_years REAL NOT NULL,
-  salary INTEGER NOT NULL,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
+Columns: `id, name, position, joinDate, releaseDate, yearsOfExperience, salary, createdAt, updatedAt`.
 
 ### Data Collections Table
-```sql
-CREATE TABLE data_collections (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  collection_date TEXT NOT NULL,
-  collection_time TEXT NOT NULL,
-  data_source TEXT NOT NULL,
-  data_content TEXT NOT NULL,
-  file_path TEXT,
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-);
-```
+Columns: `id, collection_date, collection_time, data_source, data_content, file_path, created_at`.
+
+RBAC models: `users, roles, permissions, user_roles, role_permissions`.
 
 ## Environment Variables
 
@@ -249,10 +223,34 @@ CREATE TABLE data_collections (
 |----------|-------------|---------|
 | `NODE_ENV` | Environment | `development` |
 | `PORT` | Server port | `3000` |
-| `HOST` | Server host | `localhost` |
-| `DB_PATH` | Database file path | `./data/employees.db` |
-| `CRON_DATA_PATH` | Cron data directory | `/home/cron` |
+| `HOST` | Server host | `0.0.0.0` |
+| `DATABASE_URL` | Supabase pooled URL | required |
+| `DIRECT_URL` | Supabase direct URL (migrations) | required |
+| `SUPABASE_URL` | Supabase URL | required |
+| `SUPABASE_ANON_KEY` | Supabase anon key | required |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role | required |
+| `CRON_DATA_PATH` | Local cron dir (optional) | `./cron-data` |
+| `DATA_SOURCE_URL` | External data source | `https://jsonplaceholder.typicode.com/posts` |
+| `JWT_SECRET` | JWT secret | required |
 | `LOG_LEVEL` | Logging level | `info` |
+
+## Seeded Accounts & Permissions
+
+Demo accounts (also shown on the demo UI):
+
+| Role | Email | Password |
+|------|-------|----------|
+| ADMIN | admin@huawei.com | Admin123!@# |
+| HR_MANAGER | hr.manager@huawei.com | HR123!@# |
+| MANAGER | manager@huawei.com | Manager123!@# |
+| EMPLOYEE | employee@huawei.com | Employee123!@# |
+| GUEST | guest@huawei.com | Guest123!@# |
+
+Permissions:
+- ADMIN: superadmin (memiliki seluruh permissions, termasuk `system:MANAGE`)
+- Lainnya: permissions sesuai kebutuhan CRUD employees dan akses laporan
+
+RBAC endpoints tersedia di collection Postman dan digunakan oleh FE untuk matrix izin.
 
 ## Development
 
@@ -272,51 +270,17 @@ npm run lint:fix
 npm run format
 ```
 
-## Production Deployment
+## Deployment
 
-### VPS Setup
-
-1. **Install Docker**
-   ```bash
-   curl -fsSL https://get.docker.com -o get-docker.sh
-   sh get-docker.sh
-   ```
-
-2. **Install Docker Compose**
-   ```bash
-   sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-   sudo chmod +x /usr/local/bin/docker-compose
-   ```
-
-3. **Clone and Deploy**
-   ```bash
-   git clone <repository-url>
-   cd huawei
-   docker-compose up -d
-   ```
-
-4. **Set up Reverse Proxy (Nginx)**
-   ```nginx
-   server {
-       listen 80;
-       server_name your-domain.com;
-       
-       location / {
-           proxy_pass http://localhost:3000;
-           proxy_http_version 1.1;
-           proxy_set_header Upgrade $http_upgrade;
-           proxy_set_header Connection 'upgrade';
-           proxy_set_header Host $host;
-           proxy_cache_bypass $http_upgrade;
-       }
-   }
-   ```
+- Render: Docker web service, `trust proxy` enabled, Prisma configured for pgBouncer
+- Frontend: Surge (`fe/`), set `window.__API_BASE__` to backend base URL
+- CI/CD: GitHub Actions used for earlier flow; Render handles deploys now
 
 ## Monitoring
 
 - **Health Check**: `GET /health`
 - **Logs**: Check `./logs/app.log`
-- **Docker Logs**: `docker-compose logs -f`
+- **Docker Logs**: `docker-compose logs -f` or `docker logs -f <id>`
 
 ## Troubleshooting
 
@@ -335,18 +299,9 @@ npm run format
    chmod 644 data/employees.db
    ```
 
-3. **Cron data directory not found**
+3. **Cron data directory not found (local)**
    ```bash
    # Create directory
    mkdir -p /home/cron
    chmod 755 /home/cron
    ```
-
-## License
-
-MIT License - see LICENSE file for details.
-
-## Support
-
-For issues and questions, please create an issue in the repository.
-
