@@ -13,11 +13,10 @@ class SupabaseCronService {
   
   async createCronJob(jobName, schedule, command, description) {
     try {
-      const { data, error } = await this.supabase.rpc('cron.schedule', {
+      const { data, error } = await this.supabase.rpc('cron_schedule', {
         job_name: jobName,
         schedule: schedule,
-        command: command,
-        description: description
+        command: command
       });
 
       if (error) {
@@ -36,7 +35,7 @@ class SupabaseCronService {
   
   async deleteCronJob(jobName) {
     try {
-      const { data, error } = await this.supabase.rpc('cron.unschedule', {
+      const { data, error } = await this.supabase.rpc('cron_unschedule', {
         job_name: jobName
       });
 
