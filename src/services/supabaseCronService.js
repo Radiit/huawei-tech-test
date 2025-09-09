@@ -55,9 +55,7 @@ class SupabaseCronService {
   
   async listCronJobs() {
     try {
-      const { data, error } = await this.supabase.rpc('exec_sql', {
-        sql: 'SELECT * FROM cron.job ORDER BY jobid;'
-      });
+      const { data, error } = await this.supabase.rpc('cron_list_jobs');
 
       if (error) {
         logger.error('Error listing cron jobs:', error);
@@ -282,9 +280,7 @@ class SupabaseCronService {
 
   async getCronJobStatus() {
     try {
-      const { data, error } = await this.supabase.rpc('exec_sql', {
-        sql: 'SELECT * FROM cron.job_run_details ORDER BY start_time DESC LIMIT 50;'
-      });
+      const { data, error } = await this.supabase.rpc('cron_list_run_details');
 
       if (error) {
         logger.error('Error getting cron job status:', error);
