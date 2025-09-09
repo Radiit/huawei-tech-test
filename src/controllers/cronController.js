@@ -187,19 +187,38 @@ class CronController {
       const fname = `cron_${pad(wib.getMonth()+1)}${pad(wib.getDate())}${wib.getFullYear()}_${pad(wib.getHours())}.${pad(wib.getMinutes())}.csv`;
       const path = `cron/${fname}`;
 
-      // CSV from latest data collection
-      const collectionDate = latest.collectionDate || latest.collection_date || '';
-      const collectionTime = latest.collectionTime || latest.collection_time || '';
-      const dataSource = latest.dataSource || latest.data_source || '';
-      const filePath = latest.filePath || latest.file_path || '';
-      const rawPayload = latest.dataContent || latest.data_content || '';
-      let payloadJson;
-      try { payloadJson = JSON.stringify(JSON.parse(rawPayload)); } catch { payloadJson = String(rawPayload); }
+      let dataSource = latest.dataSource || latest.data_source || '';
+      let csv;
+      try {
+        if (!dataSource || !/^https?:\/\//i.test(dataSource)) {
+          dataSource = 'https://jsonplaceholder.typicode.com/posts';
+        }
+        if (dataSource) {
+          const resp = await fetch(dataSource, { method: 'GET' });
+          const data = await resp.json();
+          if (Array.isArray(data) && data.length && 'id' in data[0] && 'title' in data[0] && 'body' in data[0]) {
+            const header = 'ID,Title,Body,User ID,Collected At';
+            const collectedAt = new Date().toISOString();
+            const esc = (v) => '"' + String(v).replace(/"/g, '""').replace(/\n/g,' ') + '"';
+            const rows = data.map(p => [p.id, p.title, p.body, (p.userId ?? ''), collectedAt].map(esc).join(',')).join('\n');
+            csv = header + '\n' + rows + '\n';
+          }
+        }
+      } catch (e) {
+      }
 
-      const esc = (v) => '"' + String(v).replace(/"/g, '""') + '"';
-      const header = 'collection_date,collection_time,data_source,file_path,payload';
-      const row = [collectionDate, collectionTime, dataSource, filePath, payloadJson].map(esc).join(',');
-      const csv = header + '\n' + row + '\n';
+      if (!csv) {
+        const collectionDate = latest.collectionDate || latest.collection_date || '';
+        const collectionTime = latest.collectionTime || latest.collection_time || '';
+        const filePath = latest.filePath || latest.file_path || '';
+        const rawPayload = latest.dataContent || latest.data_content || '';
+        let payloadJson;
+        try { payloadJson = JSON.stringify(JSON.parse(rawPayload)); } catch { payloadJson = String(rawPayload); }
+        const esc = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+        const header = 'collection_date,collection_time,data_source,file_path,payload';
+        const row = [collectionDate, collectionTime, dataSource, filePath, payloadJson].map(esc).join(',');
+        csv = header + '\n' + row + '\n';
+      }
 
       const payload = Buffer.from(csv);
       const uploaded = await storage.uploadFile({ buffer: payload, mimetype: 'text/csv' }, path);
