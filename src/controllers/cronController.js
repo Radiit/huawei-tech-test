@@ -184,11 +184,25 @@ class CronController {
       const now = new Date();
       const wib = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jakarta' }));
       const pad = n => String(n).padStart(2, '0');
-      const fname = `cron_${pad(wib.getMonth()+1)}${pad(wib.getDate())}${wib.getFullYear()}_${pad(wib.getHours())}.${pad(wib.getMinutes())}.json`;
+      const fname = `cron_${pad(wib.getMonth()+1)}${pad(wib.getDate())}${wib.getFullYear()}_${pad(wib.getHours())}.${pad(wib.getMinutes())}.csv`;
       const path = `cron/${fname}`;
 
-      const payload = Buffer.from(JSON.stringify(latest, null, 2));
-      const uploaded = await storage.uploadFile({ buffer: payload, mimetype: 'application/json' }, path);
+      // CSV from latest data collection
+      const collectionDate = latest.collectionDate || latest.collection_date || '';
+      const collectionTime = latest.collectionTime || latest.collection_time || '';
+      const dataSource = latest.dataSource || latest.data_source || '';
+      const filePath = latest.filePath || latest.file_path || '';
+      const rawPayload = latest.dataContent || latest.data_content || '';
+      let payloadJson;
+      try { payloadJson = JSON.stringify(JSON.parse(rawPayload)); } catch { payloadJson = String(rawPayload); }
+
+      const esc = (v) => '"' + String(v).replace(/"/g, '""') + '"';
+      const header = 'collection_date,collection_time,data_source,file_path,payload';
+      const row = [collectionDate, collectionTime, dataSource, filePath, payloadJson].map(esc).join(',');
+      const csv = header + '\n' + row + '\n';
+
+      const payload = Buffer.from(csv);
+      const uploaded = await storage.uploadFile({ buffer: payload, mimetype: 'text/csv' }, path);
 
       return res.json({ success: true, message: 'Latest data exported to storage', data: { uploaded, recordId: latest.id } });
     } catch (error) {
