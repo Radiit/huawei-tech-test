@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Huawei Employee Management — Modern Dashboard</title>
+  <meta name="description" content="Professional employee management system with a modern UI and comprehensive features" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="brand">
+          <div class="brand-icon" aria-hidden="true">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <rect width="32" height="32" rx="8" fill="url(#gradient-brand)"/>
+              <path d="M8 12h16v2H8v-2zm0 4h16v2H8v-2zm0 4h10v2H8v-2z" fill="white"/>
+              <defs>
+                <linearGradient id="gradient-brand" x1="0" y1="0" x2="32" y2="32">
+                  <stop stop-color="#3B82F6"/>
+                  <stop offset="1" stop-color="#1E40AF"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">Huawei Employee Management</h1>
+            <p class="brand-subtitle">Modern Dashboard</p>
+          </div>
+        </div>
+
+        <div class="header-status">
+          <div class="status-indicator" id="connectionStatus" role="status" aria-live="polite">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span class="status-text">Connecting…</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="container stack">
+      <!-- Config -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="panel-title">Configuration</h2>
+            <p class="panel-subtitle">System configuration and API settings</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="kv">
+            <div class="kv-label">API Base URL</div>
+            <code class="kv-value" id="baseUrlDisplay">—</code>
+          </div>
+        </div>
+      </section>
+
+      <!-- Demo Accounts -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="panel-title">Demo Accounts</h2>
+            <p class="panel-subtitle">Pre-configured test accounts with different access levels</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="account-grid">
+            <div class="account-card">
+              <div class="account-role admin">ADMIN</div>
+              <div class="account-fields">
+                <div><span>Email</span><code>admin@huawei.com</code></div>
+                <div><span>Password</span><code>Admin123!@#</code></div>
+              </div>
+            </div>
+
+            <div class="account-card">
+              <div class="account-role hr">HR_MANAGER</div>
+              <div class="account-fields">
+                <div><span>Email</span><code>hr.manager@huawei.com</code></div>
+                <div><span>Password</span><code>HR123!@#</code></div>
+              </div>
+            </div>
+
+            <div class="account-card">
+              <div class="account-role manager">MANAGER</div>
+              <div class="account-fields">
+                <div><span>Email</span><code>manager@huawei.com</code></div>
+                <div><span>Password</span><code>Manager123!@#</code></div>
+              </div>
+            </div>
+
+            <div class="account-card">
+              <div class="account-role employee">EMPLOYEE</div>
+              <div class="account-fields">
+                <div><span>Email</span><code>employee@huawei.com</code></div>
+                <div><span>Password</span><code>Employee123!@#</code></div>
+              </div>
+            </div>
+
+            <div class="account-card">
+              <div class="account-role guest">GUEST</div>
+              <div class="account-fields">
+                <div><span>Email</span><code>guest@huawei.com</code></div>
+                <div><span>Password</span><code>Guest123!@#</code></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hint">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span>Tip: Login first, then try creating/listing employees and generating reports.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Auth -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+              <circle cx="12" cy="16" r="1"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="panel-title">Authentication</h2>
+            <p class="panel-subtitle">User registration and login management</p>
+          </div>
+        </div>
+
+        <div class="panel-body grid-2">
+          <div>
+            <h3 class="section-title">Register New User</h3>
+            <form class="form" id="registerForm">
+              <label class="form-row">
+                <span class="form-label" for="regEmail">Email</span>
+                <input id="regEmail" class="input" type="email" placeholder="you@example.com" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="regPassword">Password</span>
+                <input id="regPassword" class="input" type="password" placeholder="••••••••" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="regFirst">First Name</span>
+                <input id="regFirst" class="input" type="text" placeholder="Jane" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="regLast">Last Name</span>
+                <input id="regLast" class="input" type="text" placeholder="Doe" required />
+              </label>
+              <button type="submit" class="btn btn-primary" id="btnRegister">
+                <span class="btn-text">Create Account</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </button>
+            </form>
+          </div>
+
+          <div>
+            <h3 class="section-title">Login</h3>
+            <form class="form" id="loginForm">
+              <label class="form-row">
+                <span class="form-label" for="loginEmail">Email</span>
+                <input id="loginEmail" class="input" type="email" placeholder="you@example.com" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="loginPassword">Password</span>
+                <input id="loginPassword" class="input" type="password" placeholder="••••••••" required />
+              </label>
+              <button type="submit" class="btn btn-primary" id="btnLogin">
+                <span class="btn-text">Sign In</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </button>
+
+              <div id="tokenDisplay" class="token" hidden>
+                <div class="token-head">Access Token</div>
+                <div class="token-body">
+                  <code id="tokenCode"></code>
+                  <button type="button" class="token-copy" id="tokenCopy" title="Copy token">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Employees -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="panel-title">Employee Management</h2>
+            <p class="panel-subtitle">Create, view, and manage employee records</p>
+          </div>
+        </div>
+
+        <div class="panel-body grid-2">
+          <div>
+            <h3 class="section-title">Create Employee</h3>
+            <form class="form" id="employeeForm">
+              <label class="form-row">
+                <span class="form-label" for="empName">Full Name</span>
+                <input id="empName" class="input" type="text" placeholder="Elena Zhang" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="empPosition">Position</span>
+                <input id="empPosition" class="input" type="text" placeholder="Software Engineer" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="empSalary">Salary</span>
+                <input id="empSalary" class="input" type="number" placeholder="20000000" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="empYoE">Years of Experience</span>
+                <input id="empYoE" class="input" type="number" placeholder="3" required />
+              </label>
+              <button type="submit" class="btn btn-primary" id="btnCreateEmployee">
+                <span class="btn-text">Add Employee</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </button>
+            </form>
+          </div>
+
+          <div>
+            <div class="list-header">
+              <h3 class="section-title">Employee List</h3>
+              <button class="btn btn-secondary" id="btnListEmployees">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                <span>Refresh Data</span>
+              </button>
+            </div>
+
+            <div class="viewer" id="employeeViewer">
+              <div class="placeholder" id="employeesPlaceholder">
+                <div class="placeholder-inner">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                  </svg>
+                  <p>Click <b>Refresh Data</b> to load employees.</p>
+                </div>
+              </div>
+              <pre class="content" id="employeesList" hidden></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Reports -->
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-icon" aria-hidden="true">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 3v18h18"/>
+              <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="panel-title">Reports & Analytics</h2>
+            <p class="panel-subtitle">Generate comprehensive employee reports and insights</p>
+          </div>
+        </div>
+
+        <div class="panel-body grid-2">
+          <div>
+            <h3 class="section-title">Generate Reports</h3>
+            <div class="report-actions">
+              <button class="btn btn-secondary" id="btnTopExperience">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                </svg>
+                <span>Top Experience</span>
+              </button>
+
+              <button class="btn btn-secondary" id="btnLowExpEngineers">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M8 12h8"/>
+                </svg>
+                <span>Low Experience Engineers</span>
+              </button>
+
+              <div class="report-input-group">
+                <input id="reportYear" class="input" type="number" placeholder="Year (e.g. 2024)" min="2020" max="2030" />
+                <button class="btn btn-primary" id="btnSalaryByYear">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="12" y1="1" x2="12" y2="23"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                  </svg>
+                  <span>Total Salary</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="section-title">Report Results</h3>
+            <div class="viewer" id="reportsViewer">
+              <div class="placeholder" id="reportsPlaceholder">
+                <div class="placeholder-inner">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                    <path d="M3 3v18h18"/>
+                    <path d="M18.7 8l-5.1 5.2-2.8-2.7L7 14.3"/>
+                  </svg>
+                  <p>Select a report to view results.</p>
+                </div>
+              </div>
+              <pre class="content" id="reportsOut" hidden></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- System Ops -->
+      <div class="grid-2">
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                <polyline points="14,2 14,8 20,8"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="panel-title">File Storage</h2>
+              <p class="panel-subtitle">Check upload & persistence health</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <button class="btn btn-secondary btn-full" id="btnStorageHealth">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+              <span>Check Storage Health</span>
+            </button>
+
+            <div class="viewer small" id="storageViewer">
+              <div class="placeholder" id="storagePlaceholder">
+                <p>Click the button above to check storage status.</p>
+              </div>
+              <pre class="content" id="storageOut" hidden></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12,6 12,12 16,14"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="panel-title">Cron Management</h2>
+              <p class="panel-subtitle">Create, inspect, and check cron jobs</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="cron-buttons">
+              <button class="btn btn-secondary btn-small" id="btnCronSetup">Setup</button>
+              <button class="btn btn-secondary btn-small" id="btnCronJobs">List Jobs</button>
+              <button class="btn btn-secondary btn-small" id="btnCronStatus">Status</button>
+            </div>
+
+            <div class="viewer small" id="cronViewer">
+              <div class="placeholder" id="cronPlaceholder">
+                <p>Select a cron operation.</p>
+              </div>
+              <pre class="content" id="cronOut" hidden></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cron Customization -->
+        <section class="panel">
+          <div class="panel-header">
+            <div class="panel-icon" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                <path d="M7 8h10M7 12h10M7 16h6"/>
+              </svg>
+            </div>
+            <div>
+              <h2 class="panel-title">Cron Test & Custom</h2>
+              <p class="panel-subtitle">Create custom cron jobs and preview data</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <form class="form grid-3" id="cronCustomForm">
+              <label class="form-row">
+                <span class="form-label" for="cronJobName">Job Name</span>
+                <input id="cronJobName" class="input" type="text" placeholder="adhoc_collect" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="cronSchedule">Schedule</span>
+                <input id="cronSchedule" class="input" type="text" placeholder="*/5 * * * *" required />
+              </label>
+              <label class="form-row">
+                <span class="form-label" for="cronCommand">SQL Command</span>
+                <input id="cronCommand" class="input" type="text" placeholder="SELECT cron_data_collection('adhoc');" required />
+              </label>
+              <div class="grid-3-actions">
+                <button type="button" class="btn btn-primary" id="btnCronCreate">Create</button>
+                <button type="button" class="btn btn-outline" id="btnCronDelete">Delete</button>
+                <button type="button" class="btn btn-secondary" id="btnCronRefreshAll2">Refresh All</button>
+              </div>
+            </form>
+
+            <div class="viewer small" id="cronCustomViewer">
+              <div class="placeholder" id="cronCustomPlaceholder">
+                <p>Use the form to create or delete a custom cron job. Then refresh to view.</p>
+              </div>
+              <pre class="content" id="cronCustomOut" hidden></pre>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <a id="healthLink" href="#" target="_blank" class="health-link" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          <span>System Health Monitor</span>
+        </a>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Toasts -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Config -->
+  <script>
+    window.__API_BASE__ = 'https://huawei-tech-test.onrender.com';
+  </script>
+  <script src="app.js" defer></script>
+</body>
+</html>
