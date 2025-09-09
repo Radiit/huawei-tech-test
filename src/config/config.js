@@ -34,7 +34,12 @@ const config = {
       maxRequests: parseInt(process.env.API_RATE_LIMIT_MAX_REQUESTS) || 100
     },
     cors: {
-      origin: process.env.CORS_ORIGIN || '*',
+      origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [
+        'https://huawei-tech-test.surge.sh', 
+        'http://huawei-tech-test.surge.sh', 
+        'http://localhost:5173',
+        'http://localhost:3000'
+      ],
       credentials: true
     }
   },
