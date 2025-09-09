@@ -1,8 +1,8 @@
 # Huawei Employee Management System
 
-    🚀 Demo: [huawei-tech-test.surge.sh](http://huawei-tech-test.surge.sh)
+🚀 Demo: [huawei-tech-test.surge.sh](http://huawei-tech-test.surge.sh)
 
-    📝 API Docs: [Postman Documentation](https://documenter.getpostman.com/view/39299483/2sB3HnKf8f)
+📝 API Docs: [Postman Documentation](https://documenter.getpostman.com/view/39299483/2sB3HnKf8f)
 
 ## Tech Stack
 
