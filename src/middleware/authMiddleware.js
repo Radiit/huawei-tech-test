@@ -186,7 +186,37 @@ const canReadPermissions = authorize('permissions', 'READ');
 const canViewReports = authorize('reports', 'READ');
 const canManageReports = authorize('reports', 'MANAGE');
 
-const canManageSystem = authorize('system', 'MANAGE');
+const canManageSystem = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    const hasPermission = await rbacService.userHasPermission(
+      req.user.id,
+      'system',
+      'MANAGE'
+    );
+
+    if (!hasPermission) {
+      return res.status(403).json({
+        success: false,
+        message: 'Insufficient permissions - SYSTEM_MANAGE required'
+      });
+    }
+
+    next();
+  } catch (error) {
+    logger.error('System authorization error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Authorization check failed'
+    });
+  }
+};
 
 const canManageFiles = authorize('system', 'MANAGE');
 

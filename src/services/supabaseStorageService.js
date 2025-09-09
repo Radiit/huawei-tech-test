@@ -203,11 +203,24 @@ class SupabaseStorageService {
 
   async healthCheck() {
     try {
+      if (!this.supabase) {
+        return { 
+          status: 'unhealthy', 
+          service: 'supabase_storage', 
+          error: 'Supabase not configured - missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY' 
+        };
+      }
+      
       await this.listFiles();
       return { status: 'healthy', service: 'supabase_storage' };
     } catch (error) {
       logger.error('Supabase Storage health check failed:', error);
-      return { status: 'unhealthy', service: 'supabase_storage', error: error.message };
+      return { 
+        status: 'unhealthy', 
+        service: 'supabase_storage', 
+        error: error.message,
+        suggestion: 'Check SUPABASE_SERVICE_ROLE_KEY and ensure bucket exists'
+      };
     }
   }
 }
