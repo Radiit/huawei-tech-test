@@ -42,27 +42,35 @@ class PrismaAuthService {
 
   async login(email, password) {
     try {
-      const user = await prisma.client.user.findUnique({
-        where: { email }
-      });
+      // Use raw SQL to avoid prepared statement conflicts
+      const users = await prisma.client.$queryRaw`
+        SELECT id, email, password_hash, first_name, last_name, is_active, last_login, created_at, updated_at
+        FROM users 
+        WHERE email = ${email}
+        LIMIT 1
+      `;
+      
+      const user = users[0];
       
       if (!user) {
         throw new Error('Invalid email or password');
       }
 
-      if (!user.isActive) {
+      if (!user.is_active) {
         throw new Error('Account is deactivated');
       }
 
-      const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+      const isValidPassword = await bcrypt.compare(password, user.password_hash);
       if (!isValidPassword) {
         throw new Error('Invalid email or password');
       }
 
-      await prisma.client.user.update({
-        where: { id: user.id },
-        data: { lastLogin: new Date() }
-      });
+      // Update last login using raw SQL
+      await prisma.client.$queryRaw`
+        UPDATE users 
+        SET last_login = NOW() 
+        WHERE id = ${user.id}
+      `;
 
       const token = this.generateToken(user);
 
@@ -72,12 +80,12 @@ class PrismaAuthService {
         user: {
           id: user.id,
           email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          isActive: user.isActive,
-          lastLogin: user.lastLogin,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt
+          firstName: user.first_name,
+          lastName: user.last_name,
+          isActive: user.is_active,
+          lastLogin: new Date(),
+          createdAt: user.created_at,
+          updatedAt: user.updated_at
         },
         token
       };
