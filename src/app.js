@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -92,6 +93,13 @@ class Application {
       }
     });
 
+    this.app.get(['/index.html', '/demo', '/ui'], (req, res) => {
+      const p = path.join(process.cwd(), 'public', 'index.html');
+      res.sendFile(p, (err) => {
+        if (err) res.status(404).json({ success: false, message: 'Frontend index not found' });
+      });
+    });
+
     // API routes
     this.app.use('/api/auth', authRoutes);
     this.app.use('/api/rbac', rbacRoutes);
@@ -144,7 +152,6 @@ class Application {
           logger.warn('Database connection: FAILED - some features may not work');
         }
 
-        // Auto-start local cron in production if Supabase Cron is disabled
         if (!require('./config/config').supabase.cronEnabled && process.env.LOCAL_CRON_AUTOSTART === 'true') {
           try {
             scheduler.start();
