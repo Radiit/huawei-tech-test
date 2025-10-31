@@ -131,18 +131,24 @@ class DataCollector {
       const dataContent = JSON.stringify(data);
 
       const filePath = path.join(this.dataPath, filename);
-      const fileBuffer = await fs.readFile(filePath);
-      
-      const mockFile = {
-        buffer: fileBuffer,
-        originalname: filename,
-        mimetype: 'text/csv'
-      };
-
-      const uploadResult = await supabaseStorageService.uploadDataCollectionFile(
-        mockFile, 
-        `collection_${Date.now()}`
-      );
+      let storagePath = null;
+      try {
+        if (supabaseStorageService.supabase) {
+          const fileBuffer = await fs.readFile(filePath);
+          const mockFile = {
+            buffer: fileBuffer,
+            originalname: filename,
+            mimetype: 'text/csv'
+          };
+          const uploadResult = await supabaseStorageService.uploadDataCollectionFile(
+            mockFile,
+            `collection_${Date.now()}`
+          );
+          storagePath = uploadResult.path;
+        }
+      } catch (e) {
+        logger.warn('Skipping storage upload; continuing with local file path', e.message);
+      }
 
       await prisma.client.dataCollection.create({
         data: {
@@ -150,7 +156,7 @@ class DataCollector {
           collectionTime,
           dataSource: this.sourceUrl,
           dataContent,
-          filePath: uploadResult.path
+          filePath: storagePath || filePath
         }
       });
 

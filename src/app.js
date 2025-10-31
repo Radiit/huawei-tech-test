@@ -18,6 +18,7 @@ const rbacRoutes = require('./routes/rbacRoutes');
 const fileRoutes = require('./routes/fileRoutes');
 const cronRoutes = require('./routes/cronRoutes');
 const supabaseCronRoutes = require('./routes/supabaseCronRoutes');
+const scheduler = require('./scripts/cronScheduler');
 
 class Application {
   constructor() {
@@ -141,6 +142,16 @@ class Application {
           logger.info('Database connection: OK');
         } else {
           logger.warn('Database connection: FAILED - some features may not work');
+        }
+
+        // Auto-start local cron in production if Supabase Cron is disabled
+        if (!require('./config/config').supabase.cronEnabled && process.env.LOCAL_CRON_AUTOSTART === 'true') {
+          try {
+            scheduler.start();
+            logger.info('Local cron scheduler auto-started');
+          } catch (e) {
+            logger.error('Failed to auto-start local cron scheduler:', e);
+          }
         }
       });
 

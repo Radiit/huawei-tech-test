@@ -4,6 +4,11 @@ const { logger } = require('../utils/logger');
 
 class SupabaseCronService {
   constructor() {
+    if (!config.supabase.cronEnabled || !config.supabase.url || !config.supabase.serviceRoleKey) {
+      logger.warn('Supabase (cron) not configured; cron APIs will be disabled');
+      this.supabase = null;
+      return;
+    }
     this.supabase = createClient(
       config.supabase.url,
       config.supabase.serviceRoleKey
@@ -13,6 +18,7 @@ class SupabaseCronService {
   
   async createCronJob(jobName, schedule, command, description) {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       const { data, error } = await this.supabase.rpc('cron_schedule', {
         job_name: jobName,
         schedule: schedule,
@@ -35,6 +41,7 @@ class SupabaseCronService {
   
   async deleteCronJob(jobName) {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       const { data, error } = await this.supabase.rpc('cron_unschedule', {
         job_name: jobName
       });
@@ -55,6 +62,7 @@ class SupabaseCronService {
   
   async listCronJobs() {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       const { data, error } = await this.supabase.rpc('cron_list_jobs');
 
       if (error) {
@@ -71,6 +79,7 @@ class SupabaseCronService {
 
   async setupCronJobs() {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       logger.info('Setting up Supabase pg_cron jobs...');
 
       // Data collection jobs (3 times daily: 08:00, 12:00, 15:00 WIB)
@@ -130,6 +139,7 @@ class SupabaseCronService {
 
   async createCronFunctions() {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       logger.info('Creating cron database functions...');
 
       const dataCollectionFunction = `
@@ -242,6 +252,7 @@ class SupabaseCronService {
 
   async testCronJob(jobName) {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       let command;
       
       switch (jobName) {
@@ -280,6 +291,7 @@ class SupabaseCronService {
 
   async getCronJobStatus() {
     try {
+      if (!this.supabase) throw new Error('Supabase not configured');
       const { data, error } = await this.supabase.rpc('cron_list_run_details');
 
       if (error) {

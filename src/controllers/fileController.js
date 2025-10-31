@@ -35,6 +35,9 @@ class FileController {
   // Upload employee document
   async uploadEmployeeDocument(req, res) {
     try {
+      if (!supabaseStorageService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const { employeeId } = req.params;
       const { documentType } = req.body;
 
@@ -110,6 +113,9 @@ class FileController {
   // Upload profile picture
   async uploadProfilePicture(req, res) {
     try {
+      if (!supabaseStorageService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const { userId } = req.params;
 
       if (!req.file) {
@@ -164,6 +170,9 @@ class FileController {
   // Get file by ID
   async getFile(req, res) {
     try {
+      if (!supabaseStorageService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const { fileId } = req.params;
 
       const fileRecord = await prisma.client.dataCollection.findUnique({
@@ -204,6 +213,9 @@ class FileController {
   // Download file
   async downloadFile(req, res) {
     try {
+      if (!supabaseStorageService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const { fileId } = req.params;
 
       const fileRecord = await prisma.client.dataCollection.findUnique({
@@ -239,6 +251,9 @@ class FileController {
   // Delete file
   async deleteFile(req, res) {
     try {
+      if (!supabaseStorageService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const { fileId } = req.params;
 
       const fileRecord = await prisma.client.dataCollection.findUnique({
@@ -279,6 +294,9 @@ class FileController {
   // List files
   async listFiles(req, res) {
     try {
+      if (!supabaseStorageService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const { folder = '', page = 1, limit = 10 } = req.query;
 
       // List files from Supabase Storage

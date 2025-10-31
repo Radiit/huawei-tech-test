@@ -17,7 +17,8 @@ const config = {
   supabase: {
     url: process.env.SUPABASE_URL,
     anonKey: process.env.SUPABASE_ANON_KEY,
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    cronEnabled: process.env.SUPABASE_CRON_ENABLED === 'true'
   },
 
   // Cron Configuration

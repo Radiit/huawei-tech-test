@@ -19,6 +19,7 @@ router.post('/login',
 
 router.use(authenticate);
 
+router.get('/me', authController.me);
 router.get('/profile', authController.getProfile);
 router.put('/profile', 
   User.getUpdateValidationRules(),

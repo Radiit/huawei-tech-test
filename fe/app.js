@@ -85,7 +85,7 @@
     if (baseUrlDisplay) baseUrlDisplay.textContent = BASE || 'NOT SET';
     if (healthLink) healthLink.href = BASE ? `${BASE}/health` : '#';
   
-    let token = '';
+    let token = localStorage.getItem('huawei_token') || '';
   
     const authHeader = () =>
       token ? { Authorization: `Bearer ${token}` } : {};
@@ -177,11 +177,18 @@
 
      if (r.ok && r.data && r.data.success && r.data.data && r.data.data.token) {
          token = r.data.data.token;
+         localStorage.setItem('huawei_token', token);
          tokenCode.textContent = token;
          tokenDisplay.hidden = false;
-         toast('Login success', 'success');
+         const me = await api('/api/auth/me', { headers: { ...authHeader() } });
+         if (me.ok) {
+           toast('Login success', 'success');
+         } else {
+           toast('Login success (profile unavailable)', 'warn');
+         }
      } else {
          token = '';
+         localStorage.removeItem('huawei_token');
          tokenDisplay.hidden = true;
          console.error('Login failed:', r);
          const msg = r.status === 401 ? 'Unauthorized (check email/password)' : 
@@ -221,7 +228,8 @@
         name: $('#empName').value.trim(),
         position: $('#empPosition').value.trim(),
         salary: Number($('#empSalary').value),
-        yearsOfExperience: Number($('#empYoE').value),
+        experience_years: Number($('#empYoE').value),
+        join_date: new Date().toISOString().slice(0,10)
       };
       const r = await api('/api/employees', {
         method: 'POST',

@@ -3,6 +3,27 @@ const rbacService = require('../services/prismaRbacService');
 const { logger } = require('../utils/logger');
 
 class AuthController {
+  async me(req, res) {
+    try {
+      const user = req.user;
+      return res.json({
+        success: true,
+        data: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
+        }
+      });
+    } catch (error) {
+      logger.error('Error in me controller:', error);
+      return res.status(500).json({ success: false, message: 'Internal server error' });
+    }
+  }
   async register(req, res) {
     try {
       const user = await authService.register(req.body);

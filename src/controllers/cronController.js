@@ -2,10 +2,14 @@ const supabaseCronService = require('../services/supabaseCronService');
 const { logger } = require('../utils/logger');
 const prisma = require('../lib/prisma');
 const storage = require('../services/supabaseStorageService');
+const scheduler = require('../scripts/cronScheduler');
 
 class CronController {
   async createCustomCron(req, res) {
     try {
+      if (!supabaseCronService.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase cron is not configured for this environment' });
+      }
       const { jobName, schedule, command } = req.body || {};
       if (!jobName || !schedule || !command) {
         return res.status(400).json({ success: false, message: 'jobName, schedule, and command are required' });
@@ -21,6 +25,14 @@ class CronController {
 
   async setupCronJobs(req, res) {
     try {
+      if (!supabaseCronService.supabase) {
+        try {
+          scheduler.start();
+          return res.json({ success: true, message: 'Local cron scheduler started', data: scheduler.getStatus() });
+        } catch (e) {
+          return res.status(500).json({ success: false, message: 'Failed to start local cron', error: e.message });
+        }
+      }
       const result = await supabaseCronService.setupCronJobs();
       
       res.json({
@@ -40,6 +52,9 @@ class CronController {
 
   async createCronFunctions(req, res) {
     try {
+      if (!supabaseCronService.supabase) {
+        return res.json({ success: true, message: 'Local mode: no database functions required' });
+      }
       const result = await supabaseCronService.createCronFunctions();
       
       res.json({
@@ -59,6 +74,9 @@ class CronController {
 
   async listCronJobs(req, res) {
     try {
+      if (!supabaseCronService.supabase) {
+        return res.json({ success: true, data: scheduler.getStatus() });
+      }
       const result = await supabaseCronService.listCronJobs();
       
       res.json({
@@ -78,6 +96,14 @@ class CronController {
   async testCronJob(req, res) {
     try {
       const { jobName } = req.params;
+      if (!supabaseCronService.supabase) {
+        if (jobName === 'data_cleanup_daily') {
+          const out = await scheduler.runDataCleanup(30);
+          return res.json({ success: true, message: 'Local cleanup executed', data: out });
+        }
+        const out = await scheduler.runDataCollection();
+        return res.json({ success: true, message: 'Local collection executed', data: out });
+      }
       const result = await supabaseCronService.testCronJob(jobName);
       
       res.json({
@@ -97,6 +123,9 @@ class CronController {
 
   async getCronJobStatus(req, res) {
     try {
+      if (!supabaseCronService.supabase) {
+        return res.json({ success: true, data: scheduler.getStatus() });
+      }
       const result = await supabaseCronService.getCronJobStatus();
       
       res.json({
@@ -115,6 +144,9 @@ class CronController {
 
   async deleteCronJob(req, res) {
     try {
+      if (!supabaseCronService.supabase) {
+        return res.status(501).json({ success: false, message: 'Local mode: deleting named cron is not supported' });
+      }
       const { jobName } = req.params;
       const result = await supabaseCronService.deleteCronJob(jobName);
       
@@ -160,6 +192,9 @@ class CronController {
 
   async exportLatestCollectionToStorage(req, res) {
     try {
+      if (!storage.supabase) {
+        return res.status(503).json({ success: false, message: 'Supabase storage is not configured for this environment' });
+      }
       const latest = await prisma.client.dataCollection.findFirst({
         orderBy: { createdAt: 'desc' }
       });
